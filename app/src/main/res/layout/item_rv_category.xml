@@ -6,7 +6,7 @@
     <data>
         <variable
             name="category"
-            type="com.example.domain.Category" />
+            type="com.example.domain.entity.Category" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
             app:cardCornerRadius="16dp"
             app:cardUseCompatPadding="false"
             app:contentPadding="16dp"
@@ -31,14 +32,13 @@
 
                 <ImageView
                     android:id="@+id/iv_category"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/beverages" />
+                    tools:srcCompat="@drawable/beverages" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.cardview.widget.CardView>
 
         <TextView

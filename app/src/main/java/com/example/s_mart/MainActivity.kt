@@ -8,7 +8,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.s_mart.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null
@@ -46,15 +48,19 @@ class MainActivity : AppCompatActivity() {
         binding.materialToolbar.setupWithNavController(navController,appBarConfiguration)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id in destinations) {
+                binding.bottomNavigationView.visibility = View.VISIBLE
+            }
+            else {
+                binding.bottomNavigationView.visibility = View.GONE
+            }
             when (destination.id) {
                 R.id.splashFragment -> {
-                    binding.bottomNavigationView.visibility = View.GONE
                     supportActionBar?.hide()
                 }
 
                 R.id.homeFragment -> {
                     if (!supportActionBar?.isShowing!!) {
-                        binding.bottomNavigationView.visibility = View.VISIBLE
                         supportActionBar?.show()
                     }
                 }
