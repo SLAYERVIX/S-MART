@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
+    <ImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/explore_by_category"
         android:layout_width="wrap_content"
@@ -15,14 +25,14 @@
         android:text="Explore by Category"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_categories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -37,7 +47,7 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="Deal of the day"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/rv_categories"
@@ -48,7 +58,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="14dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -115,10 +125,10 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2">
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView3"
@@ -140,7 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent=".35" />
+                    app:layout_constraintGuide_percent=".70" />
 
                 <TextView
                     android:id="@+id/textView4"
@@ -156,10 +166,9 @@
                     android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:text="Mega"
                     android:textColor="#D13B27"
-                    app:layout_constraintStart_toStartOf="@+id/guideline"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -192,9 +201,9 @@
         android:id="@+id/imageView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:src="@drawable/hamburger"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/frameLayout"
         app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

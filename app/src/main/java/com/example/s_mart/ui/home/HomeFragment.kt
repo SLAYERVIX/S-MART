@@ -6,12 +6,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.domain.entity.Category
 import com.example.domain.entity.ProductResponse
 import com.example.domain.entity.TodayDeal
+import com.example.s_mart.R
 import com.example.s_mart.core.Constants
 import com.example.s_mart.core.adapters.CategoryAdapter
 import com.example.s_mart.core.callbacks.CategoryCallback
@@ -42,6 +44,10 @@ class HomeFragment : Fragment(), CategoryCallback {
 
         binding.tvDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
 
+        binding.ivProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+        }
+
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -63,7 +69,8 @@ class HomeFragment : Fragment(), CategoryCallback {
 
                     binding.tvDiscount.visibility = View.VISIBLE
                     prod?.let {
-                        binding.tvDealPrice.text = "EGP " + calcDiscount(prod.price, prod.discountPercentage)
+                        binding.tvDealPrice.text =
+                            "EGP " + calcDiscount(prod.price, prod.discountPercentage)
                         binding.tvDiscount.text = "EGP " + prod.price
                     }
                 }
@@ -108,9 +115,13 @@ class HomeFragment : Fragment(), CategoryCallback {
 
     override fun onCategoryClicked(item: Category) {
         findNavController().navigate(
-            HomeFragmentDirections.actionHomeFragmentToCategoryListFragment(
-                item
-            )
+            HomeFragmentDirections.actionHomeFragmentToCategoryListFragment(item)
         )
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (requireActivity() as AppCompatActivity).supportActionBar?.show()
+    }
+
 }

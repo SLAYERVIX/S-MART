@@ -1,8 +1,8 @@
 package com.example.s_mart
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,17 +27,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.bottomNavigationView.visibility = View.GONE
-        supportActionBar?.hide()
 
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
-        setSupportActionBar(binding.materialToolbar)
-
         val destinations = setOf(
             R.id.homeFragment,
-            R.id.cartFragment
+            R.id.cartFragment,
         )
 
         val appBarConfiguration = AppBarConfiguration.Builder(
@@ -45,7 +42,6 @@ class MainActivity : AppCompatActivity() {
         ).build()
 
         binding.bottomNavigationView.setupWithNavController(navController)
-        binding.materialToolbar.setupWithNavController(navController,appBarConfiguration)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id in destinations) {
@@ -53,17 +49,6 @@ class MainActivity : AppCompatActivity() {
             }
             else {
                 binding.bottomNavigationView.visibility = View.GONE
-            }
-            when (destination.id) {
-                R.id.splashFragment -> {
-                    supportActionBar?.hide()
-                }
-
-                R.id.homeFragment -> {
-                    if (!supportActionBar?.isShowing!!) {
-                        supportActionBar?.show()
-                    }
-                }
             }
         }
     }

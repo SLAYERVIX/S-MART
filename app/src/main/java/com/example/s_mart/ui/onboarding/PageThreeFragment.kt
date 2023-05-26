@@ -25,7 +25,7 @@ class PageThreeFragment : Fragment() {
         _binding = FragmentPageThreeBinding.inflate(inflater,container,false)
 
         binding.button.setOnClickListener {
-            findNavController().navigate(R.id.action_onBoardingFragment_to_loginFragment)
+            findNavController().navigate(R.id.action_onBoardingFragment_to_login)
         }
 
         // Inflate the layout for this fragment

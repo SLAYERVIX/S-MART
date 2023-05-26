@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.s_mart.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_categoryListFragment"
+            app:destination="@id/categoryListFragment">
+            <argument
+                android:name="category"
+                app:argType="com.example.domain.entity.Category" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.s_mart.ui.cart.CartFragment"
+        android:label="Cart"
+        tools:layout="@layout/fragment_cart" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.s_mart.ui.profile.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/main"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.s_mart.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+    <fragment
+        android:id="@+id/categoryListFragment"
+        android:name="com.example.s_mart.CategoryListFragment"
+        android:label="fragment_category_list"
+        tools:layout="@layout/fragment_category_list" >
+        <argument
+            android:name="category"
+            app:argType="com.example.domain.entity.Category" />
+    </fragment>
+</navigation>
