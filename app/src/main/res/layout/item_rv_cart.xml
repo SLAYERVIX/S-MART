@@ -48,7 +48,7 @@
             android:maxLines="1"
             android:text="@{product.name}"
             android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@+id/btn_clear"
+            app:layout_constraintEnd_toStartOf="@+id/btn_delete"
             app:layout_constraintStart_toEndOf="@+id/cardView"
             app:layout_constraintTop_toTopOf="@+id/cardView"
             app:layout_constraintVertical_chainStyle="packed"

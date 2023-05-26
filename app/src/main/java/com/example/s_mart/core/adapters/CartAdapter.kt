@@ -13,7 +13,7 @@ import com.example.s_mart.core.differs.CartDiffItemCallback
 import com.example.s_mart.databinding.ItemRvCartBinding
 
 
-class ProductAdapter(private val cartCallback: CartCallback) : ListAdapter<Product, ProductAdapter.ViewHolder>(CartDiffItemCallback()) {
+class CartAdapter(private val cartCallback: CartCallback) : ListAdapter<Product, CartAdapter.ViewHolder>(CartDiffItemCallback()) {
     inner class ViewHolder(private val binding: ItemRvCartBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Product) {
