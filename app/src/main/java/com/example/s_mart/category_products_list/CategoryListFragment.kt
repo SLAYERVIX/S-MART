@@ -1,4 +1,4 @@
-package com.example.s_mart
+package com.example.s_mart.category_products_list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.example.domain.entity.Product
-import com.example.s_mart.core.Constants
 import com.example.s_mart.core.adapters.CategoryListAdapter
+import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.databinding.FragmentCategoryListBinding
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,4 +1,4 @@
-package com.example.s_mart
+package com.example.s_mart.ui
 
 import android.os.Bundle
 import android.view.View
@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.example.s_mart.R
 import com.example.s_mart.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 

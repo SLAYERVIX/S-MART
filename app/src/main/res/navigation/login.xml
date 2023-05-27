@@ -9,12 +9,36 @@
         android:id="@+id/loginFragment"
         android:name="com.example.s_mart.ui.login.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_main"
             app:destination="@id/main"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_main2"
+            app:destination="@id/main"
+            app:popUpTo="@id/login"
+            app:popUpToInclusive="true" />
     </fragment>
     <include app:graph="@navigation/main" />
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.s_mart.ui.register.RegisterFragment"
+        android:label="RegisterFragment"
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_registerFragment_to_main"
+            app:destination="@id/main"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

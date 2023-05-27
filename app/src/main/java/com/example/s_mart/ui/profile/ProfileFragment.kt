@@ -31,7 +31,8 @@ class ProfileFragment : Fragment() {
             firebaseAuth.signOut()
 
             if (firebaseAuth.currentUser == null) {
-                findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                // Navigate to LoginFragment
+                findNavController().navigate(R.id.action_global_login)
             }
         }
 

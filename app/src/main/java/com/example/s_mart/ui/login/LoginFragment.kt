@@ -1,13 +1,13 @@
 package com.example.s_mart.ui.login
 
 import android.os.Bundle
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.s_mart.R
+import com.example.s_mart.core.utils.Validation
 import com.example.s_mart.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -34,6 +34,10 @@ class LoginFragment : Fragment() {
 
         binding.btnLogin.setOnClickListener {
             attemptLogin()
+        }
+
+        binding.btnRegister.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
 
         // Inflate the layout for this fragment
@@ -76,37 +80,34 @@ class LoginFragment : Fragment() {
             }
     }
 
-    private fun setLoginButtonEnabled(isEnabled : Boolean) {
+    private fun validateEmail(email: String): Boolean {
+        return Validation.validateEmail(email) { result ->
+            if (result == 0) {
+                setEmailHelperText(getString(R.string.field_cannot_be_empty))
+            }
+            if (result == 1) {
+                setEmailHelperText(getString(R.string.you_must_enter_a_valid_email))
+            }
+        }
+    }
+    private fun validatePassword(password: String): Boolean {
+        return Validation.validatePassword(password) { result ->
+            if (result == 0) {
+                setPasswordHelperText(getString(R.string.field_cannot_be_empty))
+            }
+            else {
+                setPasswordHelperText(getString(R.string.minimum_password_chars))
+            }
+        }
+    }
+
+    private fun setLoginButtonEnabled(isEnabled: Boolean) {
         binding.btnLogin.isEnabled = isEnabled
     }
 
     private fun resetHelpersText() {
         binding.containerEmail.helperText = null
         binding.containerPassword.helperText = null
-    }
-
-    private fun validateEmail(email: String): Boolean {
-        if (email.isEmpty()) {
-            setEmailHelperText(getString(R.string.field_cannot_be_empty))
-            return false
-        }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            setEmailHelperText(getString(R.string.you_must_enter_a_valid_email))
-            return false
-        }
-        return true
-    }
-
-    private fun validatePassword(password: String): Boolean {
-        if (password.isEmpty()) {
-            setPasswordHelperText(getString(R.string.field_cannot_be_empty))
-            return false
-        }
-        if (password.length < 6) {
-            setPasswordHelperText(getString(R.string.minimum_password_chars))
-            return false
-        }
-        return true
     }
 
     private fun setEmailHelperText(message: String) {

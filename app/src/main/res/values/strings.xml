@@ -18,4 +18,9 @@
     <string name="incorrect_email">Incorrect Email!</string>
     <string name="incorrect_password">Incorrect Password!</string>
     <string name="logout">Logout</string>
+    <string name="create_an_account_to_continue">Create an account to continue</string>
+    <string name="getting_started">Getting Started</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="create_account">Create Account</string>
+    <string name="display_name">Display Name</string>
 </resources>

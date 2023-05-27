@@ -1,4 +1,4 @@
-package com.example.s_mart.core
+package com.example.s_mart.core.utils
 
 import com.example.domain.entity.Product
 import com.example.domain.entity.ProductResponse

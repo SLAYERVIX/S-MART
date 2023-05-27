@@ -1,6 +1,5 @@
 package com.example.s_mart.ui.cart
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -16,7 +15,6 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -25,15 +23,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.domain.entity.Product
 import com.example.domain.entity.ProductResponse
 import com.example.s_mart.R
-import com.example.s_mart.core.Constants
-import com.example.s_mart.core.Mappers
+import com.example.s_mart.core.utils.Constants
+import com.example.s_mart.core.utils.Mappers
 import com.example.s_mart.core.adapters.CartAdapter
 import com.example.s_mart.core.callbacks.CartCallback
 import com.example.s_mart.core.utils.calcDiscount

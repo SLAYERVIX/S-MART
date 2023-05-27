@@ -14,9 +14,9 @@ import com.example.domain.entity.Category
 import com.example.domain.entity.ProductResponse
 import com.example.domain.entity.TodayDeal
 import com.example.s_mart.R
-import com.example.s_mart.core.Constants
 import com.example.s_mart.core.adapters.CategoryAdapter
 import com.example.s_mart.core.callbacks.CategoryCallback
+import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentHomeBinding
 import com.google.firebase.firestore.FirebaseFirestore
@@ -45,7 +45,7 @@ class HomeFragment : Fragment(), CategoryCallback {
         binding.tvDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
 
         binding.ivProfile.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_profile)
         }
 
         // Inflate the layout for this fragment
