@@ -7,6 +7,8 @@ object Constants {
     const val CATEGORIES_REF = "categories"
     const val PRODUCTS_REF = "products"
     const val TODAY_DEAL_REF = "deal_of_the_day"
+    const val CLIENTS_REF = "clients"
+    const val CATEGORY_REF = "category"
 
     // Bluetooth things
     const val DESIRED_DEVICE_ADDRESS = "DD:0D:30:FE:41:EF"

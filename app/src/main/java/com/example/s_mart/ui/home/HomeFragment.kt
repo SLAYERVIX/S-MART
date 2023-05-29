@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.domain.entity.Category
-import com.example.domain.entity.ProductResponse
+import com.example.domain.entity.Product
 import com.example.domain.entity.TodayDeal
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CategoryAdapter
@@ -61,7 +61,7 @@ class HomeFragment : Fragment(), CategoryCallback {
                 val ref = fireStore.collection(Constants.PRODUCTS_REF).document(productID.productID)
                 ref.get().addOnSuccessListener { product ->
 
-                    val prod = product.toObject(ProductResponse::class.java)
+                    val prod = product.toObject(Product::class.java)
 
                     Glide.with(binding.imageView3).load(prod?.imgUrl).into(binding.imageView3)
 

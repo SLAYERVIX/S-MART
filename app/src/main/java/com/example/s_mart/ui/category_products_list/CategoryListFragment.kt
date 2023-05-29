@@ -1,4 +1,4 @@
-package com.example.s_mart.category_products_list
+package com.example.s_mart.ui.category_products_list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -44,7 +44,7 @@ class CategoryListFragment : Fragment() {
     }
 
     private fun getCategoryItems(adapter: CategoryListAdapter) {
-        val query = reference.whereEqualTo("category", args.category.categoryName)
+        val query = reference.whereEqualTo(Constants.CATEGORY_REF, args.category.categoryName)
         query.get().addOnSuccessListener {
             adapter.submitList(it.toObjects(Product::class.java))
         }

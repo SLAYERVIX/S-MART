@@ -6,21 +6,30 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.domain.entity.Client
 import com.example.s_mart.R
+import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.core.utils.Validation
 import com.example.s_mart.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var clientsReference: CollectionReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+        clientsReference = firestore.collection(Constants.CLIENTS_REF)
     }
 
     override fun onCreateView(
@@ -66,29 +75,47 @@ class RegisterFragment : Fragment() {
 
         setLoginButtonEnabled(false)
 
+        createAccount(email, password, displayName)
+    }
+
+
+    private fun createAccount(email: String, password: String, displayName: String) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                task.addOnSuccessListener {
-                    val user = firebaseAuth.currentUser
+                task.addOnSuccessListener { authResult ->
+                    val user = authResult.user
                     user?.let {
-                        val profileUpdates = UserProfileChangeRequest.Builder()
-                            .setDisplayName(displayName)
-                            .build()
-
-                        it.updateProfile(profileUpdates)
-                            .addOnCompleteListener { updateTask ->
-                                setLoginButtonEnabled(true)
-                                if (updateTask.isSuccessful) {
-                                    findNavController().navigate(R.id.action_registerFragment_to_main)
-                                } else {
-                                    // Handle profile update failure
-                                }
-                            }
+                        updateProfileAndAddClientDocument(it, displayName)
                     }
                 }
                 task.addOnFailureListener {
                     setLoginButtonEnabled(true)
                 }
+            }
+    }
+
+    private fun updateProfileAndAddClientDocument(user: FirebaseUser, displayName: String) {
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setDisplayName(displayName)
+            .build()
+
+        user.updateProfile(profileUpdates)
+            .addOnCompleteListener { updateTask ->
+                setLoginButtonEnabled(true)
+                updateTask.addOnSuccessListener {
+                    addClientDocument(user)
+                }
+            }
+    }
+
+    private fun addClientDocument(user: FirebaseUser) {
+        clientsReference.document(user.uid).set(Client())
+            .addOnSuccessListener {
+                // Client document added successfully
+                findNavController().navigate(R.id.action_registerFragment_to_main)
+            }
+            .addOnFailureListener { e ->
+                // Error adding client document
             }
     }
 
