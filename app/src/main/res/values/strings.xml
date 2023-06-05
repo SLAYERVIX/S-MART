@@ -24,4 +24,13 @@
     <string name="create_account">Create Account</string>
     <string name="display_name">Display Name</string>
     <string name="clear">Clear</string>
+    <string name="confirm_payment">Confirm Payment</string>
+    <string name="cvv">CVV</string>
+    <string name="expire_date">Expire Date</string>
+    <string name="payment">Payment</string>
+    <string name="credit_card">Credit Card</string>
+    <string name="orders">Orders</string>
+    <string name="points">Points</string>
+    <string name="redeem">Redeem</string>
+    <string name="insufficient_balance">Insufficient balance</string>
 </resources>

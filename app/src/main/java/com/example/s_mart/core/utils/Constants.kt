@@ -9,6 +9,8 @@ object Constants {
     const val TODAY_DEAL_REF = "deal_of_the_day"
     const val CLIENTS_REF = "clients"
     const val CATEGORY_REF = "category"
+    const val DEAL = "deal"
+    const val VOUCHERS_REF = "vouchers"
 
     // Bluetooth things
     const val DESIRED_DEVICE_ADDRESS = "DD:0D:30:FE:41:EF"

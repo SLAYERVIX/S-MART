@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.domain.entity.Client
 import com.example.domain.entity.Product
 import com.example.s_mart.R
@@ -115,6 +116,10 @@ class CartFragment : Fragment(), CartCallback {
 
         binding.btnClear.setOnClickListener {
             dialog.show()
+        }
+
+        binding.btnCheckout.setOnClickListener {
+            findNavController().navigate(R.id.action_cartFragment_to_payment)
         }
 
         // Inflate the layout for this fragment

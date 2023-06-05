@@ -19,6 +19,7 @@ import com.example.s_mart.core.callbacks.CategoryCallback
 import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentHomeBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeFragment : Fragment(), CategoryCallback {
@@ -27,9 +28,11 @@ class HomeFragment : Fragment(), CategoryCallback {
     private val binding get() = _binding!!
 
     private lateinit var fireStore: FirebaseFirestore
+    private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        firebaseAuth = FirebaseAuth.getInstance()
         fireStore = FirebaseFirestore.getInstance()
     }
 
@@ -47,13 +50,17 @@ class HomeFragment : Fragment(), CategoryCallback {
         binding.ivProfile.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_profile)
         }
+        firebaseAuth.currentUser?.let {
+            binding.tvName.text = it.displayName
+        }
+
 
         // Inflate the layout for this fragment
         return binding.root
     }
 
     private fun setupTodayDeal() {
-        val dayDealReference = fireStore.collection(Constants.TODAY_DEAL_REF).document("deal")
+        val dayDealReference = fireStore.collection(Constants.TODAY_DEAL_REF).document(Constants.DEAL)
         dayDealReference.get().addOnSuccessListener { it ->
             val productID = it.toObject(TodayDeal::class.java)
 
@@ -123,5 +130,4 @@ class HomeFragment : Fragment(), CategoryCallback {
         super.onDestroyView()
         (requireActivity() as AppCompatActivity).supportActionBar?.show()
     }
-
 }
