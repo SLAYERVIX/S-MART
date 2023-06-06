@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 class RewardsFragment : Fragment(), RedeemCallBack {
 
@@ -32,9 +33,9 @@ class RewardsFragment : Fragment(), RedeemCallBack {
         super.onCreate(savedInstanceState)
 
         firebaseAuth = FirebaseAuth.getInstance()
+
         fireStore = FirebaseFirestore.getInstance()
-        vouchersReference =
-            fireStore.collection(Constants.VOUCHERS_REF)
+        vouchersReference = fireStore.collection(Constants.VOUCHERS_REF)
 
         clientsReference =
             fireStore.collection(Constants.CLIENTS_REF).document(firebaseAuth.currentUser!!.uid)
@@ -46,23 +47,15 @@ class RewardsFragment : Fragment(), RedeemCallBack {
     ): View {
         _binding = FragmentRewardsBinding.inflate(inflater, container, false)
 
-
         val adapter = RewardsAdapter(this)
         binding.rvVouchers.adapter = adapter
 
-        clientsReference.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener {
-                val client = it.toObject(Client::class.java)
-
-                client?.let {
-                    binding.tvPoints.text = client.points.toString()
-                }
-            }
-            task.addOnFailureListener {
-
+        clientsReference.addSnapshotListener { value, error ->
+            val client = value?.toObject(Client::class.java)
+            client?.let {
+                binding.tvPoints.text = it.points.toString()
             }
         }
-
 
         vouchersReference.get().addOnCompleteListener { task ->
             task.addOnSuccessListener { snapshot ->
@@ -88,13 +81,18 @@ class RewardsFragment : Fragment(), RedeemCallBack {
                 val client = it.toObject(Client::class.java)
                 client?.let {
                     if (client.points >= item.cost) {
+                        item._id = UUID.randomUUID().toString()
                         client.points -= item.cost
-                        client.voucher = item
+                        client.vouchers.add(item)
 
                         clientsReference.set(client)
                     }
                     else {
-                        Toast.makeText(requireContext(), getString(R.string.insufficient_balance), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.insufficient_balance),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

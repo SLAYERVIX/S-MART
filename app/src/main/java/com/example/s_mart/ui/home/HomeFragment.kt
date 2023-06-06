@@ -54,7 +54,6 @@ class HomeFragment : Fragment(), CategoryCallback {
             binding.tvName.text = it.displayName
         }
 
-
         // Inflate the layout for this fragment
         return binding.root
     }

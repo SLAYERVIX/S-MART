@@ -24,9 +24,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.domain.entity.Client
 import com.example.domain.entity.Product
+import com.example.domain.entity.Voucher
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CartAdapter
+import com.example.s_mart.core.adapters.VoucherAdapter
 import com.example.s_mart.core.callbacks.CartCallback
+import com.example.s_mart.core.callbacks.VoucherCallback
 import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentCartBinding
@@ -39,7 +42,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("MissingPermission")
-class CartFragment : Fragment(), CartCallback {
+class CartFragment : Fragment(), CartCallback, VoucherCallback {
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
 
@@ -56,7 +59,8 @@ class CartFragment : Fragment(), CartCallback {
 
     private lateinit var bluetoothGattCallback: BluetoothGattCallback
 
-    private val adapter = CartAdapter(this)
+    private val cartAdapter = CartAdapter(this)
+    private val voucherAdapter = VoucherAdapter(this)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -97,15 +101,19 @@ class CartFragment : Fragment(), CartCallback {
     ): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
 
-        binding.rvProducts.adapter = adapter
+        binding.rvProducts.adapter = cartAdapter
+        binding.rvVouchers.adapter = voucherAdapter
 
         clientsReference.addSnapshotListener { value, error ->
             if (value != null) {
                 val client = value.toObject(Client::class.java)
                 client?.let {
-                    adapter.submitList(it.cart.products)
+                    cartAdapter.submitList(it.cart.products)
+                    voucherAdapter.submitList(it.vouchers)
 
-                    updateUi(it.cart.products.isEmpty(), client.cart.totalPrice)
+                    it.cart.totalPrice -= (it.cart.totalPrice * it.cart.appliedVoucher.discount)
+
+                    updateUi(it.cart.products.isEmpty(), it.cart.totalPrice)
                 }
             }
         }
@@ -168,7 +176,11 @@ class CartFragment : Fragment(), CartCallback {
                     // Disconnected from the device, handle accordingly
                     // You can attempt to reconnect or clean up the resources as needed
                     // For example:
-                    bluetoothAdapter.bluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback)
+                    bluetoothAdapter.bluetoothLeScanner.startScan(
+                        scanFilters,
+                        scanSettings,
+                        scanCallback
+                    )
                     bluetoothGatt.close()
                 }
             }
@@ -240,8 +252,8 @@ class CartFragment : Fragment(), CartCallback {
                     val uuid = UUID.randomUUID().toString()
 
                     client?.let {
-                        client.cart.products.add(product.copy(_id = uuid))
-                        client.cart.totalPrice += calcDiscount(
+                        it.cart.products.add(product.copy(_id = uuid))
+                        it.cart.totalPrice += calcDiscount(
                             product.price,
                             product.discountPercentage
                         )
@@ -273,7 +285,7 @@ class CartFragment : Fragment(), CartCallback {
 
             client?.let {
                 client.cart.products.remove(item)
-                client.cart.totalPrice -= calcDiscount(item.price,item.discountPercentage)
+                client.cart.totalPrice -= calcDiscount(item.price, item.discountPercentage)
 
                 clientsReference.set(client)
             }
@@ -297,6 +309,21 @@ class CartFragment : Fragment(), CartCallback {
                 bluetoothAdapter.bluetoothLeScanner.stopScan(this)
 
                 bluetoothGatt = device.connectGatt(requireContext(), false, bluetoothGattCallback)
+            }
+        }
+    }
+
+    override fun onApplyClicked(item: Voucher) {
+        clientsReference.get().addOnCompleteListener { task ->
+            task.addOnSuccessListener { snapshot ->
+                val client = snapshot.toObject(Client::class.java)
+                client?.let {
+                    it.cart.appliedVoucher = item
+                    clientsReference.set(client)
+                }
+            }
+            task.addOnFailureListener {
+
             }
         }
     }

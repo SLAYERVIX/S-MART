@@ -7,6 +7,17 @@
     android:visibility="visible"
     tools:context=".ui.cart.CartFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_vouchers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/item_rv_vouchers_horizontal" />
+
     <TextView
         android:id="@+id/tv_price"
         android:layout_width="wrap_content"
@@ -56,7 +67,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/rv_vouchers" />
 
     <Button
         android:id="@+id/btn_clear"
@@ -72,19 +83,20 @@
         android:id="@+id/iv_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="128dp"
         android:src="@drawable/no_order"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/rv_products"
         app:layout_constraintStart_toStartOf="@+id/rv_products"
-        app:layout_constraintTop_toTopOf="@+id/rv_products" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="No orders have been placed yet.\nDiscover and scan products"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/btn_checkout"
         app:layout_constraintEnd_toEndOf="@+id/rv_products"
         app:layout_constraintStart_toStartOf="@+id/rv_products"
         app:layout_constraintTop_toBottomOf="@+id/iv_empty" />
