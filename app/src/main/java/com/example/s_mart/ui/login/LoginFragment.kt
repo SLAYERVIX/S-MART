@@ -11,6 +11,7 @@ import com.example.s_mart.R
 import com.example.s_mart.core.utils.Validation
 import com.example.s_mart.databinding.FragmentLoginBinding
 import com.example.s_mart.ui.SmartViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
@@ -20,6 +21,7 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SmartViewModel by activityViewModels()
+    private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,11 +52,11 @@ class LoginFragment : Fragment() {
 
         setLoginButtonEnabled(false)
 
-        viewModel.firebaseAuth.signInWithEmailAndPassword(email, password)
+        firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 task.addOnSuccessListener {
                     setLoginButtonEnabled(true)
-                    if (viewModel.firebaseAuth.currentUser != null) {
+                    if (firebaseAuth.currentUser != null) {
                         viewModel.reInitializeDocuments()
                         findNavController().navigate(R.id.action_loginFragment_to_main)
                     }

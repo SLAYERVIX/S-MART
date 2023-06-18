@@ -15,8 +15,9 @@ class CategoryAdapter(private val categoryCallback: CategoryCallback) :
     inner class ViewHolder(private val binding: ItemRvCategoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Category) {
-            binding.category = item
 
+            binding.category = item
+            binding.executePendingBindings()
             Glide.with(binding.root.context)
                 .load(item.categoryImgUrl)
                 .into(binding.ivCategory)
@@ -24,8 +25,6 @@ class CategoryAdapter(private val categoryCallback: CategoryCallback) :
             binding.root.setOnClickListener {
                 categoryCallback.onCategoryClicked(item)
             }
-
-            binding.executePendingBindings()
         }
     }
 

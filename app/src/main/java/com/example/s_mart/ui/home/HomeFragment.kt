@@ -78,11 +78,6 @@ class HomeFragment : Fragment(), CategoryCallback {
         binding.rvCategories.adapter = categoryAdapter
 
         viewModel.categoryCollection.addSnapshotListener { value, error ->
-            if (error != null) {
-                // Handle the error appropriately
-                Log.d("rabbit", "onCreateView: $error")
-                return@addSnapshotListener
-            }
 
             val categories = mutableListOf<Category>()
             if (value != null) {
