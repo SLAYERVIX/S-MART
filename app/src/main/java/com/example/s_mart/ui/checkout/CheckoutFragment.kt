@@ -4,33 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.domain.entity.Client
-import com.example.s_mart.R
-import com.example.s_mart.core.utils.Constants
+import com.example.domain.entity.Voucher
 import com.example.s_mart.core.utils.Date
 import com.example.s_mart.databinding.FragmentCheckoutBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.s_mart.ui.SmartViewModel
 import kotlin.math.roundToInt
 
 class CheckoutFragment : Fragment() {
 
     private var _binding: FragmentCheckoutBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var fireStore: FirebaseFirestore
-    private lateinit var clientsReference: DocumentReference
-    private lateinit var firebaseAuth: FirebaseAuth
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        firebaseAuth = FirebaseAuth.getInstance()
-        fireStore = FirebaseFirestore.getInstance()
-        clientsReference =
-            fireStore.collection(Constants.CLIENTS_REF).document(firebaseAuth.currentUser!!.uid)
-    }
+    private val viewModel: SmartViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,23 +27,32 @@ class CheckoutFragment : Fragment() {
     ): View {
         _binding = FragmentCheckoutBinding.inflate(inflater, container, false)
 
-        binding.btnConfirmPayment.setOnClickListener {
-            validatePayment()
-        }
-
-        setTotalPrice()
-
-
         // Inflate the layout for this fragment
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setTotalPrice()
+
+        binding.btnConfirmPayment.setOnClickListener {
+            validatePayment()
+        }
+    }
+
     private fun setTotalPrice() {
-        clientsReference.get().addOnCompleteListener { task ->
+        viewModel.clientDocument.get().addOnCompleteListener { task ->
             task.addOnSuccessListener { snapshot ->
                 val client = snapshot.toObject(Client::class.java)
                 client?.let {
-                    binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
+                    if (it.cart.appliedVoucher.discount != 0.0) {
+                        it.cart.totalPrice -= (it.cart.totalPrice * it.cart.appliedVoucher.discount)
+                        binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
+                    }
+                    else {
+                        binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
+                    }
                 }
             }
             task.addOnFailureListener { }
@@ -72,7 +70,7 @@ class CheckoutFragment : Fragment() {
         if (!validateCvv(cvv)) return
         if (!validateHolderName(holderName)) return
 
-        clientsReference.get().addOnCompleteListener { task ->
+        viewModel.clientDocument.get().addOnCompleteListener { task ->
             task.addOnSuccessListener { snapshot ->
                 val client = snapshot.toObject(Client::class.java)
                 client?.let {
@@ -84,17 +82,19 @@ class CheckoutFragment : Fragment() {
 
                     it.cart.products.clear()
                     it.cart.totalPrice = 0.0
+                    it.vouchers.remove(it.cart.appliedVoucher)
 
+                    it.cart.appliedVoucher = Voucher()
 
+                    viewModel.clientDocument.set(it).addOnSuccessListener {
 
-                    clientsReference.set(it).addOnSuccessListener {
-                        findNavController().navigate(R.id.action_checkoutFragment_to_paymentSuccesfulFragment)
+                        Toast.makeText(requireContext(), "Successful transaction", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                        // findNavController().navigate(R.id.action_checkoutFragment_to_paymentSuccesfulFragment)
                     }
                 }
             }
-            task.addOnFailureListener {
-
-            }
+            task.addOnFailureListener {}
         }
 
     }

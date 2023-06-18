@@ -26,8 +26,8 @@
         android:label="Cart"
         tools:layout="@layout/fragment_cart" >
         <action
-            android:id="@+id/action_cartFragment_to_payment"
-            app:destination="@id/payment" />
+            android:id="@+id/action_cartFragment_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
     </fragment>
     <fragment
         android:id="@+id/categoryListFragment"
@@ -39,10 +39,14 @@
             app:argType="com.example.domain.entity.Category" />
     </fragment>
     <include app:graph="@navigation/profile" />
-    <include app:graph="@navigation/payment" />
     <fragment
         android:id="@+id/rewardsFragment"
         android:name="com.example.s_mart.ui.RewardsFragment"
         android:label="fragment_rewards"
         tools:layout="@layout/fragment_rewards" />
+    <fragment
+        android:id="@+id/checkoutFragment"
+        android:name="com.example.s_mart.ui.checkout.CheckoutFragment"
+        android:label="fragment_checkout"
+        tools:layout="@layout/fragment_checkout" />
 </navigation>

@@ -21,7 +21,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.data.Constants
 import com.example.domain.entity.Client
 import com.example.domain.entity.Product
 import com.example.domain.entity.Voucher
@@ -30,12 +32,9 @@ import com.example.s_mart.core.adapters.CartAdapter
 import com.example.s_mart.core.adapters.VoucherAdapter
 import com.example.s_mart.core.callbacks.CartCallback
 import com.example.s_mart.core.callbacks.VoucherCallback
-import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentCartBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.s_mart.ui.SmartViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 import javax.inject.Inject
@@ -43,21 +42,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 @SuppressLint("MissingPermission")
 class CartFragment : Fragment(), CartCallback, VoucherCallback {
+    private var _binding: FragmentCartBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: SmartViewModel by activityViewModels()
+
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
 
-    private var _binding: FragmentCartBinding? = null
-    private val binding get() = _binding!!
-
     private lateinit var bluetoothGatt: BluetoothGatt
-
-    private lateinit var fireStore: FirebaseFirestore
-    private lateinit var clientsReference: DocumentReference
-    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var bluetoothGattCallback: BluetoothGattCallback
 
     private lateinit var dialog: AlertDialog
-
-    private lateinit var bluetoothGattCallback: BluetoothGattCallback
 
     private val cartAdapter = CartAdapter(this)
     private val voucherAdapter = VoucherAdapter(this)
@@ -75,24 +70,17 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
     }
 
     private fun clearClientCart() {
-        clientsReference.get().addOnSuccessListener { snapshot ->
-            val client = snapshot.toObject(Client::class.java)
+        viewModel.clientDocument.get()
+            .addOnSuccessListener { snapshot ->
+                val client = snapshot.toObject(Client::class.java)
 
-            client?.let {
-                it.cart.products.clear()
-                it.cart.totalPrice = 0.0
+                client?.let {
+                    it.cart.products.clear()
+                    it.cart.totalPrice = 0.0
 
-                clientsReference.set(client)
+                    viewModel.clientDocument.set(client)
+                }
             }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        firebaseAuth = FirebaseAuth.getInstance()
-        fireStore = FirebaseFirestore.getInstance()
-        clientsReference =
-            fireStore.collection(Constants.CLIENTS_REF).document(firebaseAuth.currentUser!!.uid)
     }
 
     override fun onCreateView(
@@ -104,7 +92,7 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
         binding.rvProducts.adapter = cartAdapter
         binding.rvVouchers.adapter = voucherAdapter
 
-        clientsReference.addSnapshotListener { value, error ->
+        viewModel.clientDocument.addSnapshotListener { value, _ ->
             if (value != null) {
                 val client = value.toObject(Client::class.java)
                 client?.let {
@@ -127,7 +115,7 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
         }
 
         binding.btnCheckout.setOnClickListener {
-            findNavController().navigate(R.id.action_cartFragment_to_payment)
+            findNavController().navigate(R.id.action_cartFragment_to_checkoutFragment)
         }
 
         // Inflate the layout for this fragment
@@ -144,6 +132,7 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
                 tvPrice.visibility = View.GONE
                 tvTotal.visibility = View.GONE
                 divider.visibility = View.GONE
+                rvVouchers.visibility = View.GONE
                 tvMessage.visibility = View.VISIBLE
                 ivEmpty.visibility = View.VISIBLE
             }
@@ -157,6 +146,7 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
                 tvPrice.visibility = View.VISIBLE
                 tvTotal.visibility = View.VISIBLE
                 divider.visibility = View.VISIBLE
+                rvVouchers.visibility = View.VISIBLE
                 tvMessage.visibility = View.GONE
                 ivEmpty.visibility = View.GONE
 
@@ -225,10 +215,7 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
                     // For example, convert bytes to a string if the data represents text
                     val receivedData = String(value).trim()
 
-                    val productsReference =
-                        fireStore.collection(Constants.PRODUCTS_REF).document(receivedData)
-
-                    productsReference.get()
+                    viewModel.productCollection.document(receivedData).get()
                         .addOnSuccessListener { documentSnapshot ->
                             val prod = documentSnapshot.toObject(Product::class.java)
 
@@ -245,26 +232,27 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
     }
 
     private fun addProductToCart(product: Product) {
-        firebaseAuth.currentUser?.let { user ->
-            clientsReference.get().addOnCompleteListener { task ->
-                task.addOnSuccessListener { snapshot ->
-                    val client = snapshot.toObject(Client::class.java)
-                    val uuid = UUID.randomUUID().toString()
+        viewModel.firebaseAuth.currentUser?.let { _ ->
+            viewModel.clientDocument.get()
+                .addOnCompleteListener { task ->
+                    task.addOnSuccessListener { snapshot ->
+                        val client = snapshot.toObject(Client::class.java)
+                        val uuid = UUID.randomUUID().toString()
 
-                    client?.let {
-                        it.cart.products.add(product.copy(_id = uuid))
-                        it.cart.totalPrice += calcDiscount(
-                            product.price,
-                            product.discountPercentage
-                        )
+                        client?.let {
+                            it.cart.products.add(product.copy(_id = uuid))
+                            it.cart.totalPrice += calcDiscount(
+                                product.price,
+                                product.discountPercentage
+                            )
+                        }
+
+                        viewModel.clientDocument.set(client!!)
                     }
+                    task.addOnFailureListener {
 
-                    clientsReference.set(client!!)
+                    }
                 }
-                task.addOnFailureListener {
-
-                }
-            }
         }
     }
 
@@ -280,14 +268,14 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
     }
 
     override fun onDeleteClicked(item: Product) {
-        clientsReference.get().addOnSuccessListener { snapshot ->
+        viewModel.clientDocument.get().addOnSuccessListener { snapshot ->
             val client = snapshot.toObject(Client::class.java)
 
             client?.let {
                 client.cart.products.remove(item)
                 client.cart.totalPrice -= calcDiscount(item.price, item.discountPercentage)
 
-                clientsReference.set(client)
+                viewModel.clientDocument.set(client)
             }
         }
     }
@@ -314,19 +302,16 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
     }
 
     override fun onApplyClicked(item: Voucher) {
-        clientsReference.get().addOnCompleteListener { task ->
+        viewModel.clientDocument.get().addOnCompleteListener { task ->
             task.addOnSuccessListener { snapshot ->
                 val client = snapshot.toObject(Client::class.java)
                 client?.let {
                     it.cart.appliedVoucher = item
-                    clientsReference.set(client)
+                    viewModel.clientDocument.set(client)
                 }
             }
-            task.addOnFailureListener {
 
-            }
+            task.addOnFailureListener {}
         }
     }
 }
-
-

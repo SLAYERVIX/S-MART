@@ -5,11 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.s_mart.R
 import com.example.s_mart.core.utils.Validation
 import com.example.s_mart.databinding.FragmentLoginBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.example.s_mart.ui.SmartViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
@@ -18,14 +19,8 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var firebaseAuth: FirebaseAuth
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        firebaseAuth = FirebaseAuth.getInstance()
-    }
-
+    private val viewModel: SmartViewModel by activityViewModels()
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,11 +50,12 @@ class LoginFragment : Fragment() {
 
         setLoginButtonEnabled(false)
 
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+        viewModel.firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 task.addOnSuccessListener {
                     setLoginButtonEnabled(true)
-                    if (firebaseAuth.currentUser != null) {
+                    if (viewModel.firebaseAuth.currentUser != null) {
+                        viewModel.reInitializeDocuments()
                         findNavController().navigate(R.id.action_loginFragment_to_main)
                     }
                 }

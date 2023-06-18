@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.domain.entity.Category
@@ -16,25 +17,15 @@ import com.example.domain.entity.TodayDeal
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CategoryAdapter
 import com.example.s_mart.core.callbacks.CategoryCallback
-import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentHomeBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.s_mart.ui.SmartViewModel
 
 class HomeFragment : Fragment(), CategoryCallback {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var fireStore: FirebaseFirestore
-    private lateinit var firebaseAuth: FirebaseAuth
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        firebaseAuth = FirebaseAuth.getInstance()
-        fireStore = FirebaseFirestore.getInstance()
-    }
+    private val viewModel: SmartViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +41,7 @@ class HomeFragment : Fragment(), CategoryCallback {
         binding.ivProfile.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_profile)
         }
-        firebaseAuth.currentUser?.let {
+        viewModel.firebaseAuth.currentUser?.let {
             binding.tvName.text = it.displayName
         }
 
@@ -59,27 +50,25 @@ class HomeFragment : Fragment(), CategoryCallback {
     }
 
     private fun setupTodayDeal() {
-        val dayDealReference = fireStore.collection(Constants.TODAY_DEAL_REF).document(Constants.DEAL)
-        dayDealReference.get().addOnSuccessListener { it ->
-            val productID = it.toObject(TodayDeal::class.java)
-
+        viewModel.dealOfTheDayDocument.get().addOnSuccessListener {
+            val productID = it.toObject(TodayDeal::class.java)?.productID
             if (productID != null) {
-                val ref = fireStore.collection(Constants.PRODUCTS_REF).document(productID.productID)
-                ref.get().addOnSuccessListener { product ->
+                viewModel.productCollection.document(productID).get()
+                    .addOnSuccessListener { snapshot ->
+                        val product = snapshot.toObject(Product::class.java)
 
-                    val prod = product.toObject(Product::class.java)
+                        Glide.with(binding.imageView3).load(product?.imgUrl)
+                            .into(binding.imageView3)
 
-                    Glide.with(binding.imageView3).load(prod?.imgUrl).into(binding.imageView3)
+                        binding.tvDealName.text = product?.name
 
-                    binding.tvDealName.text = prod?.name
-
-                    binding.tvDiscount.visibility = View.VISIBLE
-                    prod?.let {
-                        binding.tvDealPrice.text =
-                            "EGP " + calcDiscount(prod.price, prod.discountPercentage)
-                        binding.tvDiscount.text = "EGP " + prod.price
+                        binding.tvDiscount.visibility = View.VISIBLE
+                        product?.let {
+                            binding.tvDealPrice.text =
+                                "EGP " + calcDiscount(product.price, product.discountPercentage)
+                            binding.tvDiscount.text = "EGP " + product.price
+                        }
                     }
-                }
             }
         }
     }
@@ -88,9 +77,7 @@ class HomeFragment : Fragment(), CategoryCallback {
         val categoryAdapter = CategoryAdapter(this)
         binding.rvCategories.adapter = categoryAdapter
 
-        val categoryReference = fireStore.collection(Constants.CATEGORIES_REF)
-
-        categoryReference.addSnapshotListener { value, error ->
+        viewModel.categoryCollection.addSnapshotListener { value, error ->
             if (error != null) {
                 // Handle the error appropriately
                 Log.d("rabbit", "onCreateView: $error")

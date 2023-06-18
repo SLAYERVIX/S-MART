@@ -1,4 +1,4 @@
-package com.example.s_mart.core.utils
+package com.example.data
 
 import java.util.UUID
 

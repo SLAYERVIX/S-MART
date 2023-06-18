@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.data.Constants
 import com.example.domain.entity.Client
 import com.example.domain.entity.Voucher
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.RewardsAdapter
 import com.example.s_mart.core.callbacks.RedeemCallBack
-import com.example.s_mart.core.utils.Constants
 import com.example.s_mart.databinding.FragmentRewardsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
