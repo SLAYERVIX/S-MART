@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp"
-    tools:context=".ui.RewardsFragment">
+    tools:context=".ui.rewards_fragment.RewardsFragment">
 
     <TextView
         android:id="@+id/textView13"

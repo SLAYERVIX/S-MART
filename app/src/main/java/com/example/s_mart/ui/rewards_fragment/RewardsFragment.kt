@@ -1,4 +1,4 @@
-package com.example.s_mart.ui
+package com.example.s_mart.ui.rewards_fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater

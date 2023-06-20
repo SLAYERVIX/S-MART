@@ -241,10 +241,7 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
 
                         client?.let {
                             it.cart.products.add(product.copy(_id = uuid))
-                            it.cart.totalPrice += calcDiscount(
-                                product.price,
-                                product.discountPercentage
-                            )
+                            it.cart.totalPrice += calcDiscount(product.price, product.discountPercentage)
                         }
 
                         viewModel.clientDocument.set(client!!)

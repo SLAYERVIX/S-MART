@@ -33,4 +33,8 @@
     <string name="points">Points</string>
     <string name="redeem">Redeem</string>
     <string name="insufficient_balance">Insufficient balance</string>
+    <string name="egp">"EGP %s"</string>
+
+    <string name="price_with_discount">Price: %1$.2f, Discount: %2$.2f%%</string>
+
 </resources>

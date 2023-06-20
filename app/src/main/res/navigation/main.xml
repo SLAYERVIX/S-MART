@@ -41,7 +41,7 @@
     <include app:graph="@navigation/profile" />
     <fragment
         android:id="@+id/rewardsFragment"
-        android:name="com.example.s_mart.ui.RewardsFragment"
+        android:name="com.example.s_mart.ui.rewards_fragment.RewardsFragment"
         android:label="fragment_rewards"
         tools:layout="@layout/fragment_rewards" />
     <fragment

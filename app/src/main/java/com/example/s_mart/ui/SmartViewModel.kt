@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class SmartViewModel : ViewModel() {
     val firebaseAuth = FirebaseAuth.getInstance()
+
     private val fireStore = FirebaseFirestore.getInstance()
 
     val productCollection = fireStore.collection(Constants.PRODUCTS_REF)

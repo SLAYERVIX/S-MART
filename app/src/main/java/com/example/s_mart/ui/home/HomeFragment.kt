@@ -2,16 +2,15 @@ package com.example.s_mart.ui.home
 
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.domain.entity.Category
+import com.example.domain.entity.Client
 import com.example.domain.entity.Product
 import com.example.domain.entity.TodayDeal
 import com.example.s_mart.R
@@ -32,9 +31,15 @@ class HomeFragment : Fragment(), CategoryCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        // Inflate the layout for this fragment
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupCategories()
         setupTodayDeal()
+        setupPoints()
 
         binding.tvDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
 
@@ -44,31 +49,58 @@ class HomeFragment : Fragment(), CategoryCallback {
         viewModel.firebaseAuth.currentUser?.let {
             binding.tvName.text = it.displayName
         }
+    }
 
-        // Inflate the layout for this fragment
-        return binding.root
+    private fun setupPoints() {
+        viewModel.clientDocument.get().addOnCompleteListener { task ->
+            task.addOnSuccessListener { snapshot ->
+                val client = snapshot.toObject(Client::class.java)
+                client?.let {
+                    binding.tvPoints.text = client.points.toString()
+                }
+            }
+        }
     }
 
     private fun setupTodayDeal() {
-        viewModel.dealOfTheDayDocument.get().addOnSuccessListener {
-            val productID = it.toObject(TodayDeal::class.java)?.productID
-            if (productID != null) {
-                viewModel.productCollection.document(productID).get()
-                    .addOnSuccessListener { snapshot ->
-                        val product = snapshot.toObject(Product::class.java)
+        viewModel.dealOfTheDayDocument.get().addOnCompleteListener { task_1 ->
+            task_1.addOnSuccessListener { snapshot_1 ->
+                val productID = snapshot_1.toObject(TodayDeal::class.java)?.productID
+                if (productID != null) {
+                    viewModel.productCollection.document(productID).get()
+                        .addOnSuccessListener { snapshot ->
+                            val product = snapshot.toObject(Product::class.java)
+                            if (product != null) {
+                                _binding?.let { // Wrap the code inside a null-check block
+                                    Glide.with(it.imageView3).load(product.imgUrl)
+                                        .into(it.imageView3)
 
-                        Glide.with(binding.imageView3).load(product?.imgUrl)
-                            .into(binding.imageView3)
+                                    it.tvDealName.text = product.name
 
-                        binding.tvDealName.text = product?.name
+                                    it.tvDiscount.visibility = View.VISIBLE
 
-                        binding.tvDiscount.visibility = View.VISIBLE
-                        product?.let {
-                            binding.tvDealPrice.text =
-                                "EGP " + calcDiscount(product.price, product.discountPercentage)
-                            binding.tvDiscount.text = "EGP " + product.price
+                                    val priceText = String.format(
+                                        getString(R.string.egp),
+                                        calcDiscount(
+                                            product.price,
+                                            product.discountPercentage
+                                        ).toString()
+                                    )
+
+                                    it.tvDealPrice.text = priceText
+                                    it.tvDiscount.text =
+                                        getString(R.string.egp, product.price.toString())
+
+//                                    it.tvDiscount.text = getString(
+//                                        R.string.price_with_discount,
+//                                        getString(R.string.egp),
+//                                        "%.2f".format(calcDiscount(product.price, product.discountPercentage))
+//                                    )
+
+                                }
+                            }
                         }
-                    }
+                }
             }
         }
     }
@@ -96,8 +128,8 @@ class HomeFragment : Fragment(), CategoryCallback {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 
@@ -105,10 +137,5 @@ class HomeFragment : Fragment(), CategoryCallback {
         findNavController().navigate(
             HomeFragmentDirections.actionHomeFragmentToCategoryListFragment(item)
         )
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        (requireActivity() as AppCompatActivity).supportActionBar?.show()
     }
 }
