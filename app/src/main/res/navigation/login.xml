@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.s_mart.ui.login.LoginFragment"
+        android:name="com.example.s_mart.ui.authentication.login.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login">
         <action
@@ -21,13 +21,17 @@
         <action
             android:id="@+id/action_loginFragment_to_main2"
             app:destination="@id/main"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/login"
             app:popUpToInclusive="true" />
     </fragment>
     <include app:graph="@navigation/main" />
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.s_mart.ui.register.RegisterFragment"
+        android:name="com.example.s_mart.ui.authentication.register.RegisterFragment"
         android:label="RegisterFragment"
         tools:layout="@layout/fragment_register" >
         <action
@@ -38,6 +42,10 @@
         <action
             android:id="@+id/action_registerFragment_to_main"
             app:destination="@id/main"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
     </fragment>

@@ -16,7 +16,6 @@ import com.example.domain.entity.TodayDeal
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CategoryAdapter
 import com.example.s_mart.core.callbacks.CategoryCallback
-import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentHomeBinding
 import com.example.s_mart.ui.SmartViewModel
 
@@ -31,12 +30,14 @@ class HomeFragment : Fragment(), CategoryCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
         // Inflate the layout for this fragment
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupCategories()
         setupTodayDeal()
         setupPoints()
@@ -46,6 +47,7 @@ class HomeFragment : Fragment(), CategoryCallback {
         binding.ivProfile.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_profile)
         }
+
         viewModel.firebaseAuth.currentUser?.let {
             binding.tvName.text = it.displayName
         }
@@ -56,7 +58,7 @@ class HomeFragment : Fragment(), CategoryCallback {
             task.addOnSuccessListener { snapshot ->
                 val client = snapshot.toObject(Client::class.java)
                 client?.let {
-                    binding.tvPoints.text = client.points.toString()
+                    binding.client = it
                 }
             }
         }
@@ -71,32 +73,9 @@ class HomeFragment : Fragment(), CategoryCallback {
                         .addOnSuccessListener { snapshot ->
                             val product = snapshot.toObject(Product::class.java)
                             if (product != null) {
-                                _binding?.let { // Wrap the code inside a null-check block
-                                    Glide.with(it.imageView3).load(product.imgUrl)
-                                        .into(it.imageView3)
-
-                                    it.tvDealName.text = product.name
-
-                                    it.tvDiscount.visibility = View.VISIBLE
-
-                                    val priceText = String.format(
-                                        getString(R.string.egp),
-                                        calcDiscount(
-                                            product.price,
-                                            product.discountPercentage
-                                        ).toString()
-                                    )
-
-                                    it.tvDealPrice.text = priceText
-                                    it.tvDiscount.text =
-                                        getString(R.string.egp, product.price.toString())
-
-//                                    it.tvDiscount.text = getString(
-//                                        R.string.price_with_discount,
-//                                        getString(R.string.egp),
-//                                        "%.2f".format(calcDiscount(product.price, product.discountPercentage))
-//                                    )
-
+                                _binding?.let {
+                                    binding.product = product
+                                    Glide.with(it.imageView3).load(product.imgUrl).into(it.imageView3)
                                 }
                             }
                         }

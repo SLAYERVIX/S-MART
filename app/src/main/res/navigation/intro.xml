@@ -3,25 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/intro"
-    app:startDestination="@id/splashFragment">
+    app:startDestination="@id/onBoardingFragment">
     <include app:graph="@navigation/login" />
-
-    <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.example.s_mart.ui.splash.SplashFragment"
-        android:label="fragment_splash"
-        tools:layout="@layout/fragment_splash">
-        <action
-            android:id="@+id/action_splashFragment_to_onBoardingFragment"
-            app:destination="@id/onBoardingFragment"
-            app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_splashFragment_to_main"
-            app:destination="@id/main"
-            app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
 
     <fragment
         android:id="@+id/onBoardingFragment"
@@ -31,6 +14,11 @@
         <action
             android:id="@+id/action_onBoardingFragment_to_login"
             app:destination="@id/login"
+            app:popUpTo="@id/onBoardingFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_onBoardingFragment_to_main"
+            app:destination="@id/main"
             app:popUpTo="@id/onBoardingFragment"
             app:popUpToInclusive="true" />
     </fragment>
