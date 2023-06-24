@@ -10,4 +10,5 @@ data class Product(
     val category : String = "",
     val bannerUrl : String = "",
     val description : String = "",
+    val isDeal : Boolean = false
 )

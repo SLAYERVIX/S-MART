@@ -13,15 +13,9 @@ class SmartViewModel : ViewModel() {
 
     val productCollection = fireStore.collection(Constants.PRODUCTS_REF)
 
-    private val dealOfTheDayCollection = fireStore.collection(Constants.TODAY_DEAL_REF)
-    val dealOfTheDayDocument = dealOfTheDayCollection.document(Constants.DEAL)
-
-    val categoryCollection = fireStore.collection(Constants.CATEGORIES_REF)
+    private val dealOfTheDayCollection = fireStore.collection(Constants.DEALS_REF)
+    val dealOfTheDayDocument = dealOfTheDayCollection.document(Constants.DEAL_OF_THE_DAY_DOC)
 
     val clientCollection = fireStore.collection(Constants.CLIENTS_REF)
     var clientDocument : DocumentReference = clientCollection.document(firebaseAuth.currentUser!!.uid)
-
-    fun reInitializeDocuments() {
-        clientDocument  = clientCollection.document(firebaseAuth.currentUser!!.uid)
-    }
 }

@@ -6,11 +6,16 @@ object Constants {
     // References
     const val CATEGORIES_REF = "categories"
     const val PRODUCTS_REF = "products"
-    const val TODAY_DEAL_REF = "deal_of_the_day"
+    const val DEALS_REF = "deals"
     const val CLIENTS_REF = "clients"
     const val CATEGORY_REF = "category"
-    const val DEAL = "deal"
     const val VOUCHERS_REF = "vouchers"
+
+    // Documents
+    const val DEAL_OF_THE_DAY_DOC = "deal_of_the_day"
+
+    // QUERY
+    const val DEAL_TYPE_FIELD = "isDeal"
 
     // Bluetooth things
     const val DESIRED_DEVICE_ADDRESS = "DD:0D:30:FE:41:EF"
