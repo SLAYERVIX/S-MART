@@ -1,9 +1,12 @@
 package com.example.data.remote
 
+import com.example.domain.states.LoginResult
 import com.example.domain.states.RegistrationResult
 import com.example.domain.states.UpdateProfileResult
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.channels.awaitClose
@@ -52,6 +55,25 @@ class FirebaseAuthService(private val firebaseAuth: FirebaseAuth) {
                 }
             }
         }
+        awaitClose()
+    }
+
+    fun loginWithEmailAndPassword(
+        email: String,
+        password: String
+    ): Flow<LoginResult> = callbackFlow {
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            trySend(LoginResult.Completed)
+            task.addOnSuccessListener { trySend(LoginResult.Success) }
+            task.addOnFailureListener { exception ->
+                when (exception) {
+                    is FirebaseNetworkException -> trySend(LoginResult.ConnectionProblem)
+                    is FirebaseAuthInvalidUserException -> trySend(LoginResult.WrongUser)
+                    is FirebaseAuthInvalidCredentialsException -> trySend(LoginResult.WrongPassword)
+                }
+            }
+        }
+
         awaitClose()
     }
 }

@@ -74,22 +74,20 @@ class RegisterFragment : Fragment() {
         val password = binding.etPassword.text.toString().trim()
 
         // Validates the display name, email, and password formats
-        if (!validateDisplayName(displayName)) {
-            setLoginButtonEnabled(true)
-            return
-        }
-
-        if (!validateEmailFormat(email)) {
-            setLoginButtonEnabled(true)
-            return
-        }
-
-        if (!validatePasswordFormat(password)) {
+        if (validateFields(displayName, email, password)) {
             setLoginButtonEnabled(true)
             return
         }
 
         createAccount(email, password, displayName)
+    }
+
+    private fun validateFields(
+        displayName: String,
+        email: String,
+        password: String
+    ): Boolean {
+        return !validateDisplayName(displayName) && !validateEmailFormat(email) && !validatePasswordFormat(password)
     }
 
     private fun createAccount(email: String, password: String, displayName: String) {

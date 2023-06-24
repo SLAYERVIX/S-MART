@@ -12,8 +12,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.domain.states.LoginResult
 import com.example.s_mart.R
 import com.example.s_mart.databinding.FragmentLoginBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
@@ -26,20 +28,29 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
+        // Inflate the layout for this fragment
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.btnLogin.setOnClickListener {
-            setLoginButtonEnabled(false)
             attemptLogin()
         }
 
         binding.btnRegister.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
+    }
 
-        // Inflate the layout for this fragment
-        return binding.root
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun attemptLogin() {
+        setLoginButtonEnabled(false)
         resetHelpersText()
 
         val email = binding.etEmail.text.toString().trim().lowercase()
@@ -60,23 +71,20 @@ class LoginFragment : Fragment() {
     private fun signInWithEmailAndPassword(email: String, password: String) {
         loginViewModel.signInWithEmailAndPassword(email, password)
         lifecycleScope.launch {
-            loginViewModel.loginResult.collect {
-                it?.let {
-                    when (it) {
-                        LoginResult.Completed -> setLoginButtonEnabled(true)
-                        LoginResult.Success -> findNavController().navigate(R.id.action_loginFragment_to_main)
-                        LoginResult.WrongUser -> setEmailHelperText(getString(R.string.incorrect_email))
-                        LoginResult.WrongPassword -> setPasswordHelperText(getString(R.string.incorrect_password))
-                        LoginResult.ConnectionProblem -> Toast.makeText(
-                            requireContext(),
-                            getString(R.string.connection_problems),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    setLoginButtonEnabled(true)
+            loginViewModel.signInWithEmailAndPassword(email, password).collect {
+                when (it) {
+                    LoginResult.Completed -> setLoginButtonEnabled(true)
+                    LoginResult.ConnectionProblem -> showToast(getString(R.string.connection_problems))
+                    LoginResult.Success -> findNavController().navigate(R.id.action_loginFragment_to_main)
+                    LoginResult.WrongPassword -> setEmailHelperText(getString(R.string.incorrect_email))
+                    LoginResult.WrongUser -> setPasswordHelperText(getString(R.string.incorrect_password))
                 }
             }
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun validateEmailFormat(email: String): Boolean {
@@ -106,10 +114,5 @@ class LoginFragment : Fragment() {
 
     private fun setPasswordHelperText(message: String) {
         binding.containerPassword.helperText = message
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 }

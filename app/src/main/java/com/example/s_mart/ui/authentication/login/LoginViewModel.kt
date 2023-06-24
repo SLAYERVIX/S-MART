@@ -1,23 +1,19 @@
 package com.example.s_mart.ui.authentication.login
 
 import androidx.lifecycle.ViewModel
+import com.example.domain.repo.FirebaseAuthRepository
 import com.example.domain.states.LoginResult
 import com.example.s_mart.R
 import com.example.s_mart.core.utils.Validation
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
-
-    private val firebaseAuth = FirebaseAuth.getInstance()
-
-    // Represents the login result as a StateFlow
-    private val _loginResult = MutableStateFlow<LoginResult?>(null)
-    val loginResult: StateFlow<LoginResult?> = _loginResult
-
+@HiltViewModel
+class LoginViewModel @Inject
+constructor(
+    private val firebaseAuthRepository: FirebaseAuthRepository
+) : ViewModel() {
     // Validates the email format and displays corresponding error messages
     fun validateEmailFormat(email: String, messageCallback: (Int) -> Unit): Boolean {
         val result = Validation.validateEmail(email)
@@ -51,27 +47,7 @@ class LoginViewModel : ViewModel() {
     }
 
     // Signs in the user with email and password
-    fun signInWithEmailAndPassword(
-        email: String,
-        password: String,
-    ) {
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            setLoginResult(LoginResult.Completed)
-            task.addOnSuccessListener {
-                if (firebaseAuth.currentUser != null) {
-                    setLoginResult(LoginResult.Success)
-                }
-            }
-            task.addOnFailureListener { exception ->
-                when (exception) {
-                    is FirebaseAuthInvalidUserException -> {setLoginResult(LoginResult.WrongUser)}
-                    is FirebaseAuthInvalidCredentialsException -> {setLoginResult(LoginResult.WrongPassword)}
-                }
-            }
-        }
-    }
-    // Sets the registration result value
-    private fun setLoginResult(result : LoginResult) {
-        _loginResult.value = result
+    fun signInWithEmailAndPassword(email: String, password: String, ) : Flow<LoginResult> {
+        return firebaseAuthRepository.loginWithEmailAndPassword(email, password)
     }
 }
