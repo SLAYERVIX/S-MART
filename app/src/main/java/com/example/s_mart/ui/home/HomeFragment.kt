@@ -64,10 +64,8 @@ class HomeFragment : Fragment(), CategoryCallback {
 
     private fun setupPoints() {
         lifecycleScope.launch {
-            homeViewModel.retrieveClient().collect { client ->
-                client.let {
-                    binding.client = it
-                }
+            homeViewModel.retrieveClient.collect { client ->
+               _binding?.client = client
             }
         }
     }

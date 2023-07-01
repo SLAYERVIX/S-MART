@@ -1,6 +1,7 @@
 package com.example.s_mart.ui.authentication.register
 
 import androidx.lifecycle.ViewModel
+import com.example.domain.repo.FireStoreRepository
 import com.example.domain.repo.FirebaseAuthRepository
 import com.example.domain.states.RegistrationResult
 import com.example.domain.states.UpdateProfileResult
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val firebaseAuthRepository: FirebaseAuthRepository
+    private val firebaseAuthRepository: FirebaseAuthRepository,
+    private val fireStoreRepository: FireStoreRepository
 ) : ViewModel() {
     // Validates the email format and displays corresponding error messages
     fun validateEmailFormat(email: String, messageCallback: (Int) -> Unit): Boolean {
@@ -55,4 +57,6 @@ class RegisterViewModel @Inject constructor(
     fun updateProfileData(displayName: String): Flow<UpdateProfileResult> {
         return firebaseAuthRepository.updateProfileData(displayName)
     }
+
+    fun createClientInstance() = fireStoreRepository.createClientInstance()
 }

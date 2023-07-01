@@ -6,40 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.data.Constants
-import com.example.domain.entity.Client
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.domain.entity.Voucher
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.RewardsAdapter
 import com.example.s_mart.core.callbacks.RedeemCallBack
 import com.example.s_mart.databinding.FragmentRewardsBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-import java.util.UUID
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class RewardsFragment : Fragment(), RedeemCallBack {
 
     private var _binding: FragmentRewardsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var fireStore: FirebaseFirestore
-    private lateinit var vouchersReference: CollectionReference
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var clientsReference: DocumentReference
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        fireStore = FirebaseFirestore.getInstance()
-        vouchersReference = fireStore.collection(Constants.VOUCHERS_REF)
-
-        clientsReference =
-            fireStore.collection(Constants.CLIENTS_REF).document(firebaseAuth.currentUser!!.uid)
-    }
+    private val voucherViewModel: VoucherViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,24 +33,19 @@ class RewardsFragment : Fragment(), RedeemCallBack {
         val adapter = RewardsAdapter(this)
         binding.rvVouchers.adapter = adapter
 
-        clientsReference.addSnapshotListener { value, error ->
-            val client = value?.toObject(Client::class.java)
-            client?.let {
-                binding.tvPoints.text = it.points.toString()
+        lifecycleScope.launch {
+            voucherViewModel.client.collect {
+                it?.let {
+                    binding.client = it
+                }
             }
         }
 
-        vouchersReference.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener { snapshot ->
-                val vouchers = ArrayList<Voucher>()
-                for (snap in snapshot) {
-                    val voucher = snap.toObject(Voucher::class.java)
-                    vouchers.add(voucher)
+        lifecycleScope.launch {
+            voucherViewModel.vouchers.collect { vouchers ->
+                if (vouchers.isNotEmpty()) {
+                    adapter.submitList(vouchers)
                 }
-                adapter.submitList(vouchers)
-            }
-            task.addOnFailureListener {
-
             }
         }
 
@@ -76,18 +54,10 @@ class RewardsFragment : Fragment(), RedeemCallBack {
     }
 
     override fun onRedeemClicked(item: Voucher) {
-        clientsReference.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener {
-                val client = it.toObject(Client::class.java)
-                client?.let {
-                    if (client.points >= item.cost) {
-                        item._id = UUID.randomUUID().toString()
-                        client.points -= item.cost
-                        client.vouchers.add(item)
-
-                        clientsReference.set(client)
-                    }
-                    else {
+        lifecycleScope.launch {
+            voucherViewModel.client.collect {
+                it?.let {
+                    if (!voucherViewModel.updateClient(item, it)) {
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.insufficient_balance),
@@ -95,9 +65,6 @@ class RewardsFragment : Fragment(), RedeemCallBack {
                         ).show()
                     }
                 }
-            }
-            task.addOnFailureListener {
-
             }
         }
     }

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="com.example.s_mart.core.utils.UtilsKt" />
 
         <variable

@@ -31,9 +31,9 @@
     </fragment>
     <fragment
         android:id="@+id/categoryListFragment"
-        android:name="com.example.s_mart.ui.category_products_list.CategoryListFragment"
+        android:name="com.example.s_mart.ui.categorized_products_list.CategorizedProductsFragment"
         android:label="fragment_category_list"
-        tools:layout="@layout/fragment_category_list">
+        tools:layout="@layout/fragment_categorized_products">
         <argument
             android:name="category"
             app:argType="com.example.domain.entity.Category" />

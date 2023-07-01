@@ -96,7 +96,9 @@ class RegisterFragment : Fragment() {
                 when (result) {
                     RegistrationResult.Completed -> {}
                     RegistrationResult.ConnectionProblem -> showToast(getString(R.string.connection_problems))
-                    RegistrationResult.Success -> updateProfileData(displayName)
+                    RegistrationResult.Success -> {
+                        updateProfileData(displayName)
+                    }
                     RegistrationResult.UserCollision -> setEmailHelperText(getString(R.string.email_already_registered))
                 }
             }
@@ -108,7 +110,10 @@ class RegisterFragment : Fragment() {
             registerViewModel.updateProfileData(displayName).collect { result ->
                 when (result) {
                     UpdateProfileResult.Completed -> setLoginButtonEnabled(true)
-                    UpdateProfileResult.Success -> findNavController().navigate(R.id.action_registerFragment_to_main)
+                    UpdateProfileResult.Success -> {
+                        registerViewModel.createClientInstance()
+                        findNavController().navigate(R.id.action_registerFragment_to_main)
+                    }
                 }
             }
         }

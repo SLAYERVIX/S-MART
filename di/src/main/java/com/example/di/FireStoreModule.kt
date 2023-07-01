@@ -27,6 +27,10 @@ object FireStoreModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class ClientCollectionReference
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class VoucherCollectionReference
+
     @Provides
     fun provideFireStore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
@@ -42,7 +46,7 @@ object FireStoreModule {
     @Provides
     @ProductCollectionReference
     @Singleton
-    fun provideDealCollectionRef(fireStore: FirebaseFirestore): CollectionReference {
+    fun provideProductReference(fireStore: FirebaseFirestore): CollectionReference {
         return fireStore.collection(Constants.PRODUCTS_REF)
     }
 
@@ -54,13 +58,27 @@ object FireStoreModule {
     }
 
     @Provides
+    @VoucherCollectionReference
+    @Singleton
+    fun provideVoucherReference(fireStore: FirebaseFirestore): CollectionReference {
+        return fireStore.collection(Constants.VOUCHERS_REF)
+    }
+
+    @Provides
     @Singleton
     fun provideFireStoreService(
         @CategoryCollectionReference categoryCollectionReference: CollectionReference,
         @ProductCollectionReference productCollectionReference: CollectionReference,
         @ClientCollectionReference clientCollectionReference: CollectionReference,
+        @VoucherCollectionReference voucherCollectionReference: CollectionReference,
         firebaseAuth: FirebaseAuth
     ): FireStoreService {
-        return FireStoreService(categoryCollectionReference,productCollectionReference,clientCollectionReference,firebaseAuth)
+        return FireStoreService(
+            categoryCollectionReference,
+            productCollectionReference,
+            clientCollectionReference,
+            voucherCollectionReference,
+            firebaseAuth
+        )
     }
 }

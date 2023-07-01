@@ -21,7 +21,7 @@ constructor(
 
     fun retrieveDealOfTheDay(): Flow<Product?> = fireStoreRepository.retrieveDealOfTheDay()
 
-    fun retrieveFirebaseUser() : FirebaseUser? = firebaseAuthRepository.retrieveCurrentUser()
+    fun retrieveFirebaseUser(): FirebaseUser? = firebaseAuthRepository.retrieveCurrentUser()
 
-    fun retrieveClient() : Flow<Client> = fireStoreRepository.retrieveClient()
+    val retrieveClient: Flow<Client?> = fireStoreRepository.retrieveClient()
 }

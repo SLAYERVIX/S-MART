@@ -16,6 +16,7 @@ object Constants {
 
     // QUERY
     const val DEAL_TYPE_FIELD = "isDeal"
+    const val PRODUCT_CATEGORY_NAME = "category"
 
     // Bluetooth things
     const val DESIRED_DEVICE_ADDRESS = "DD:0D:30:FE:41:EF"
