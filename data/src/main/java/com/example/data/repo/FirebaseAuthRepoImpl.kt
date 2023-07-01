@@ -30,4 +30,8 @@ class FirebaseAuthRepoImpl(
     override fun retrieveCurrentUser(): FirebaseUser? {
         return firebaseAuthService.retrieveCurrentUser()
     }
+
+    override fun firebaseSignOut(): Boolean {
+        return firebaseAuthService.firebaseSignOut()
+    }
 }

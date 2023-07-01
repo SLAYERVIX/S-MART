@@ -11,4 +11,5 @@ interface FirebaseAuthRepository {
     fun updateProfileData(displayName: String): Flow<UpdateProfileResult>
     fun loginWithEmailAndPassword(email: String, password: String): Flow<LoginResult>
     fun retrieveCurrentUser(): FirebaseUser?
+    fun firebaseSignOut() : Boolean
 }

@@ -81,4 +81,10 @@ class FirebaseAuthService(private val firebaseAuth: FirebaseAuth) {
     fun retrieveCurrentUser(): FirebaseUser? {
         return firebaseAuth.currentUser
     }
+
+    fun firebaseSignOut(): Boolean {
+        firebaseAuth.signOut()
+
+        return firebaseAuth.currentUser == null
+    }
 }
