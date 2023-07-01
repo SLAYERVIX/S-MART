@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -75,5 +76,9 @@ class FirebaseAuthService(private val firebaseAuth: FirebaseAuth) {
         }
 
         awaitClose()
+    }
+
+    fun retrieveCurrentUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
     }
 }

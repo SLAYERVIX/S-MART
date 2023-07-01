@@ -2,6 +2,7 @@ package com.example.data.repo
 
 import com.example.data.remote.FireStoreService
 import com.example.domain.entity.Category
+import com.example.domain.entity.Client
 import com.example.domain.entity.Product
 import com.example.domain.repo.FireStoreRepository
 import kotlinx.coroutines.flow.Flow
@@ -13,5 +14,9 @@ class FireStoreRepoImpl (private val fireStoreService: FireStoreService) : FireS
 
     override fun retrieveDealOfTheDay(): Flow<Product?> {
         return fireStoreService.retrieveDealOfTheDay()
+    }
+
+    override fun retrieveClient(): Flow<Client> {
+        return fireStoreService.retrieveClient()
     }
 }

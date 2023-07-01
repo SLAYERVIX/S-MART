@@ -3,7 +3,9 @@ package com.example.data.remote
 import android.util.Log
 import com.example.data.Constants
 import com.example.domain.entity.Category
+import com.example.domain.entity.Client
 import com.example.domain.entity.Product
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +14,9 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class FireStoreService(
     private val categoryReference: CollectionReference,
-    private val productReference: CollectionReference
+    private val productReference: CollectionReference,
+    private val clientReference: CollectionReference,
+    private val firebaseAuth: FirebaseAuth,
 ) {
     fun retrieveCategories(): Flow<List<Category>> = callbackFlow {
         categoryReference.get().addOnCompleteListener { task ->
@@ -45,6 +49,26 @@ class FireStoreService(
                     Log.e(FireStoreService::class.simpleName, "retrieveDealOfTheDay: ${it.message}")
                 }
             }
+        awaitClose()
+    }
+
+    fun retrieveClient(): Flow<Client> = callbackFlow {
+        firebaseAuth.currentUser?.let { user ->
+            clientReference.document(user.uid).get().addOnCompleteListener { task ->
+                task.addOnSuccessListener { snapshot ->
+                    val client = snapshot.toObject(Client::class.java)
+                    client?.let {
+                        trySend(it)
+                    }
+                }
+                task.addOnFailureListener { exception ->
+                    Log.e(
+                        FireStoreService::class.simpleName,
+                        "retrieveDealOfTheDay: ${exception.message}"
+                    )
+                }
+            }
+        }
         awaitClose()
     }
 }

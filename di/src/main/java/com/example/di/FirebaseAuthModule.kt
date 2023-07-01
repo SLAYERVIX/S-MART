@@ -12,6 +12,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object FirebaseAuthModule {
     @Provides
+    @Singleton
     fun provideFirebaseAuth() : FirebaseAuth {
         return FirebaseAuth.getInstance()
     }

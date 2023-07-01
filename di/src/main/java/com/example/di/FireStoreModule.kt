@@ -2,6 +2,7 @@ package com.example.di
 
 import com.example.data.Constants
 import com.example.data.remote.FireStoreService
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -21,6 +22,10 @@ object FireStoreModule {
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
     annotation class ProductCollectionReference
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class ClientCollectionReference
 
     @Provides
     fun provideFireStore(): FirebaseFirestore {
@@ -42,11 +47,20 @@ object FireStoreModule {
     }
 
     @Provides
+    @ClientCollectionReference
+    @Singleton
+    fun provideClientReference(fireStore: FirebaseFirestore): CollectionReference {
+        return fireStore.collection(Constants.CLIENTS_REF)
+    }
+
+    @Provides
     @Singleton
     fun provideFireStoreService(
         @CategoryCollectionReference categoryCollectionReference: CollectionReference,
-        @ProductCollectionReference productCollectionReference: CollectionReference
+        @ProductCollectionReference productCollectionReference: CollectionReference,
+        @ClientCollectionReference clientCollectionReference: CollectionReference,
+        firebaseAuth: FirebaseAuth
     ): FireStoreService {
-        return FireStoreService(categoryCollectionReference,productCollectionReference)
+        return FireStoreService(categoryCollectionReference,productCollectionReference,clientCollectionReference,firebaseAuth)
     }
 }

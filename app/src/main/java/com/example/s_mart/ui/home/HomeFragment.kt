@@ -6,18 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.domain.entity.Category
-import com.example.domain.entity.Client
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CategoryAdapter
 import com.example.s_mart.core.callbacks.CategoryCallback
 import com.example.s_mart.databinding.FragmentHomeBinding
-import com.example.s_mart.ui.SmartViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -29,7 +26,6 @@ class HomeFragment : Fragment(), CategoryCallback {
 
     private val categoryAdapter = CategoryAdapter(this)
 
-    private val viewModel: SmartViewModel by activityViewModels()
     private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
@@ -53,21 +49,23 @@ class HomeFragment : Fragment(), CategoryCallback {
         setupCategories()
         setupTodayDeal()
         setupPoints()
+        setupUsername()
 
         binding.ivProfile.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_profile)
         }
+    }
 
-        viewModel.firebaseAuth.currentUser?.let {
+    private fun setupUsername() {
+        homeViewModel.retrieveFirebaseUser()?.let {
             binding.tvName.text = it.displayName
         }
     }
 
     private fun setupPoints() {
-        viewModel.clientDocument.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener { snapshot ->
-                val client = snapshot.toObject(Client::class.java)
-                client?.let {
+        lifecycleScope.launch {
+            homeViewModel.retrieveClient().collect { client ->
+                client.let {
                     binding.client = it
                 }
             }
