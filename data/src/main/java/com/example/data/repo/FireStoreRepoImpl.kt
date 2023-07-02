@@ -36,4 +36,24 @@ class FireStoreRepoImpl (private val fireStoreService: FireStoreService) : FireS
     override fun updateClient(client: Client) {
         fireStoreService.updateClient(client)
     }
+
+    override fun deleteProductFromCart(product: Product) {
+        fireStoreService.deleteProductFromCart(product)
+    }
+
+    override fun clearProductsFromCart() {
+        fireStoreService.clearProductsFromCart()
+    }
+
+    override fun retrieveProductByBarcode(barcode: String): Flow<Product> {
+        return fireStoreService.retrieveProductByBarcode(barcode)
+    }
+
+    override fun addProductToCart(product: Product) {
+        fireStoreService.addProductToCart(product)
+    }
+
+    override fun updateAppliedVoucher(voucher: Voucher) {
+        fireStoreService.updateAppliedVoucher(voucher)
+    }
 }

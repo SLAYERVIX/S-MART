@@ -15,16 +15,15 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.data.Constants
-import com.example.domain.entity.Client
 import com.example.domain.entity.Product
 import com.example.domain.entity.Voucher
 import com.example.s_mart.R
@@ -32,11 +31,9 @@ import com.example.s_mart.core.adapters.CartAdapter
 import com.example.s_mart.core.adapters.VoucherAdapter
 import com.example.s_mart.core.callbacks.CartCallback
 import com.example.s_mart.core.callbacks.VoucherCallback
-import com.example.s_mart.core.utils.calcDiscount
 import com.example.s_mart.databinding.FragmentCartBinding
-import com.example.s_mart.ui.SmartViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.UUID
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,7 +41,7 @@ import javax.inject.Inject
 class CartFragment : Fragment(), CartCallback, VoucherCallback {
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SmartViewModel by activityViewModels()
+    private val cartViewModel: CartViewModel by viewModels()
 
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
@@ -69,20 +66,6 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
             }.create()
     }
 
-    private fun clearClientCart() {
-        viewModel.clientDocument.get()
-            .addOnSuccessListener { snapshot ->
-                val client = snapshot.toObject(Client::class.java)
-
-                client?.let {
-                    it.cart.products.clear()
-                    it.cart.totalPrice = 0.0
-
-                    viewModel.clientDocument.set(client)
-                }
-            }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -92,15 +75,12 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
         binding.rvProducts.adapter = cartAdapter
         binding.rvVouchers.adapter = voucherAdapter
 
-        viewModel.clientDocument.addSnapshotListener { value, _ ->
-            if (value != null) {
-                val client = value.toObject(Client::class.java)
+        lifecycleScope.launch {
+            cartViewModel.retrieveClient().collect { client ->
                 client?.let {
                     cartAdapter.submitList(it.cart.products)
                     voucherAdapter.submitList(it.vouchers)
-
                     it.cart.totalPrice -= (it.cart.totalPrice * it.cart.appliedVoucher.discount)
-
                     updateUi(it.cart.products.isEmpty(), it.cart.totalPrice)
                 }
             }
@@ -155,6 +135,10 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
         }
     }
 
+    private fun clearClientCart() {
+        cartViewModel.clearCart()
+    }
+
     private fun setupBluetooth() {
         bluetoothGattCallback = object : BluetoothGattCallback() {
             override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
@@ -176,7 +160,6 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
             }
 
             override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     val service = gatt.getService(Constants.SERVICE_UUID)
                     val characteristic = service?.getCharacteristic(Constants.CHARACTERISTICS_UUID)
@@ -213,44 +196,24 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
                 if (value.isNotEmpty()) {
                     // Process the received data according to your requirements
                     // For example, convert bytes to a string if the data represents text
-                    val receivedData = String(value).trim()
+                    val barcode = String(value).trim()
 
-                    viewModel.productCollection.document(receivedData).get()
-                        .addOnSuccessListener { documentSnapshot ->
-                            val prod = documentSnapshot.toObject(Product::class.java)
-
-                            if (prod != null) {
-                                addProductToCart(prod)
-                            }
-
-                        }.addOnFailureListener { exception ->
-                            Log.e("rabbit", "Error retrieving product data: ${exception.message}")
-                        }
+                    retrieveProductByBarcode(barcode)
                 }
             }
         }
     }
 
-    private fun addProductToCart(product: Product) {
-        viewModel.firebaseAuth.currentUser?.let { _ ->
-            viewModel.clientDocument.get()
-                .addOnCompleteListener { task ->
-                    task.addOnSuccessListener { snapshot ->
-                        val client = snapshot.toObject(Client::class.java)
-                        val uuid = UUID.randomUUID().toString()
-
-                        client?.let {
-                            it.cart.products.add(product.copy(_id = uuid))
-                            it.cart.totalPrice += calcDiscount(product.price, product.discountPercentage)
-                        }
-
-                        viewModel.clientDocument.set(client!!)
-                    }
-                    task.addOnFailureListener {
-
-                    }
-                }
+    private fun retrieveProductByBarcode(barcode: String) {
+        lifecycleScope.launch {
+            cartViewModel.retrieveProductByBarcode(barcode).collect {
+                addProductToCart(it)
+            }
         }
+    }
+
+    private fun addProductToCart(product: Product) {
+        cartViewModel.addProductToCart(product)
     }
 
     override fun onDestroy() {
@@ -265,23 +228,13 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
     }
 
     override fun onDeleteClicked(item: Product) {
-        viewModel.clientDocument.get().addOnSuccessListener { snapshot ->
-            val client = snapshot.toObject(Client::class.java)
-
-            client?.let {
-                client.cart.products.remove(item)
-                client.cart.totalPrice -= calcDiscount(item.price, item.discountPercentage)
-
-                viewModel.clientDocument.set(client)
-            }
-        }
+        cartViewModel.removeProductFromCart(item)
     }
 
     private val scanFilters = mutableListOf<ScanFilter>()
 
     private val scanSettings = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-        .build()
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -299,16 +252,6 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
     }
 
     override fun onApplyClicked(item: Voucher) {
-        viewModel.clientDocument.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener { snapshot ->
-                val client = snapshot.toObject(Client::class.java)
-                client?.let {
-                    it.cart.appliedVoucher = item
-                    viewModel.clientDocument.set(client)
-                }
-            }
-
-            task.addOnFailureListener {}
-        }
+        cartViewModel.updateAppliedVoucher(item)
     }
 }

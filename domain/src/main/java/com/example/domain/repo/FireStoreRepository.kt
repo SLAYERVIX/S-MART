@@ -10,9 +10,13 @@ interface FireStoreRepository {
     fun retrieveCategories(): Flow<List<Category>>
     fun retrieveDealOfTheDay(): Flow<Product?>
     fun retrieveClient(): Flow<Client?>
-
     fun retrieveCategorizedProducts(categoryName : String): Flow<List<Product>?>
     fun retrieveVouchers(): Flow<List<Voucher>>
     fun createClientInstance()
     fun updateClient(client: Client)
+    fun deleteProductFromCart(product: Product)
+    fun clearProductsFromCart()
+    fun retrieveProductByBarcode(barcode: String): Flow<Product>
+    fun addProductToCart(product: Product)
+    fun updateAppliedVoucher(voucher: Voucher)
 }

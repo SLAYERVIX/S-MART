@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), CategoryCallback {
-
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -75,7 +74,7 @@ class HomeFragment : Fragment(), CategoryCallback {
             homeViewModel.retrieveDealOfTheDay().collect { deal ->
                 deal?.let { product ->
                     binding.product = product
-                    Glide.with(binding.ivDeal).load(product.imgUrl).into(binding.ivDeal)
+                    Glide.with(requireContext()).load(product.imgUrl).into(binding.ivDeal)
                 }
             }
         }

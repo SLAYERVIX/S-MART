@@ -1,7 +1,8 @@
-package com.example.s_mart.di
+package com.example.di
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import dagger.Module
 import dagger.Provides
@@ -12,11 +13,17 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object BluetoothModule {
     @Provides
     @Singleton
     fun provideBluetoothAdapter(@ApplicationContext context: Context) : BluetoothAdapter {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         return manager.adapter
+    }
+
+    @Provides
+    @Singleton
+    fun provideScanSettings() : ScanSettings{
+        return ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
     }
 }
