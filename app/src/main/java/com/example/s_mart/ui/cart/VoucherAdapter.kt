@@ -1,4 +1,4 @@
-package com.example.s_mart.core.adapters
+package com.example.s_mart.ui.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,26 +6,24 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.domain.entity.Voucher
 import com.example.s_mart.core.differs.VoucherDiffItemCallback
-import com.example.s_mart.databinding.ItemRvRewardBinding
+import com.example.s_mart.databinding.ItemRvVouchersHorizontalBinding
 
-class RewardsAdapter  :
-    ListAdapter<Voucher, RewardsAdapter.ViewHolder>(VoucherDiffItemCallback()) {
-
-    var onRedeemClicked: ((Voucher) -> Unit)? = null
-    inner class ViewHolder(private val binding: ItemRvRewardBinding) :
+class VoucherAdapter : ListAdapter<Voucher, VoucherAdapter.ViewHolder>(VoucherDiffItemCallback()) {
+    var onApplyClicked: ((Voucher) -> Unit)? = null
+    inner class ViewHolder(private val binding: ItemRvVouchersHorizontalBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Voucher) {
             binding.voucher = item
             binding.executePendingBindings()
-            binding.btnRedeem.setOnClickListener {
-                onRedeemClicked?.invoke(item)
+            binding.button2.setOnClickListener {
+                onApplyClicked?.invoke(item)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemRvRewardBinding.inflate(
+            ItemRvVouchersHorizontalBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

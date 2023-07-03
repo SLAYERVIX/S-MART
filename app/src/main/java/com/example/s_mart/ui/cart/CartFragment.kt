@@ -13,8 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.domain.entity.Product
 import com.example.s_mart.R
-import com.example.s_mart.core.adapters.CartAdapter
-import com.example.s_mart.core.adapters.VoucherAdapter
 import com.example.s_mart.databinding.FragmentCartBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -49,23 +47,31 @@ class CartFragment : Fragment() {
     ): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
 
-        binding.rvProducts.adapter = cartAdapter
-        binding.rvVouchers.adapter = voucherAdapter
+
+        binding.apply {
+            rvProducts.adapter = cartAdapter
+            rvVouchers.adapter = voucherAdapter
+
+            btnClear.setOnClickListener {
+                dialog.show()
+            }
+
+            btnCheckout.setOnClickListener {
+                findNavController().navigate(R.id.action_cartFragment_to_checkoutFragment)
+            }
+        }
 
         onItemDeleteClicked()
         onVoucherApplyClicked()
 
-        lifecycleScope.launch {
-            cartViewModel.retrieveClient().collect { client ->
-                client?.let {
-                    cartAdapter.submitList(it.cart.products)
-                    voucherAdapter.submitList(it.vouchers)
-                    it.cart.totalPrice -= (it.cart.totalPrice * it.cart.appliedVoucher.discount)
-                    updateUi(it.cart.products.isEmpty(), it.cart.totalPrice)
-                }
-            }
-        }
+        getClientData()
+        getProductBarcode()
 
+        // Inflate the layout for this fragment
+        return binding.root
+    }
+
+    private fun getProductBarcode() {
         lifecycleScope.launch {
             cartViewModel.barcode.collect {
                 if (it.isNotEmpty()) {
@@ -73,19 +79,19 @@ class CartFragment : Fragment() {
                 }
             }
         }
+    }
 
-        cartViewModel.startScan()
+    private fun getClientData() {
+        lifecycleScope.launch {
+            cartViewModel.retrieveClient().collect { client ->
+                client?.let {
+                    cartAdapter.submitList(it.cart.products)
+                    voucherAdapter.submitList(it.vouchers)
 
-        binding.btnClear.setOnClickListener {
-            dialog.show()
+                    binding.client = it
+                }
+            }
         }
-
-        binding.btnCheckout.setOnClickListener {
-            findNavController().navigate(R.id.action_cartFragment_to_checkoutFragment)
-        }
-
-        // Inflate the layout for this fragment
-        return binding.root
     }
 
     private fun onVoucherApplyClicked() {
@@ -97,39 +103,6 @@ class CartFragment : Fragment() {
     private fun onItemDeleteClicked() {
         cartAdapter.onItemDeleteClicked = { item ->
             cartViewModel.removeProductFromCart(item)
-        }
-    }
-
-    private fun updateUi(empty: Boolean, totalPrice: Double?) {
-        if (empty) {
-            binding.apply {
-                btnCheckout.isEnabled = false
-                btnClear.visibility = View.GONE
-                btnCheckout.visibility = View.GONE
-                tvCart.visibility = View.GONE
-                tvPrice.visibility = View.GONE
-                tvTotal.visibility = View.GONE
-                divider.visibility = View.GONE
-                rvVouchers.visibility = View.GONE
-                tvMessage.visibility = View.VISIBLE
-                ivEmpty.visibility = View.VISIBLE
-            }
-        }
-        else {
-            binding.apply {
-                btnCheckout.isEnabled = true
-                btnClear.visibility = View.VISIBLE
-                btnCheckout.visibility = View.VISIBLE
-                tvCart.visibility = View.VISIBLE
-                tvPrice.visibility = View.VISIBLE
-                tvTotal.visibility = View.VISIBLE
-                divider.visibility = View.VISIBLE
-                rvVouchers.visibility = View.VISIBLE
-                tvMessage.visibility = View.GONE
-                ivEmpty.visibility = View.GONE
-
-                tvPrice.text = totalPrice.toString()
-            }
         }
     }
 

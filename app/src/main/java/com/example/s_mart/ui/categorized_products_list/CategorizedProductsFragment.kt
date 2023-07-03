@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.example.s_mart.core.adapters.CategoryListAdapter
 import com.example.s_mart.databinding.FragmentCategorizedProductsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

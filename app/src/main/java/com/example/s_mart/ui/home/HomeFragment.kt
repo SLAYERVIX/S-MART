@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.s_mart.R
-import com.example.s_mart.core.adapters.CategoryAdapter
 import com.example.s_mart.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -33,7 +32,12 @@ class HomeFragment : Fragment() {
 
         binding.apply {
             rvCategories.adapter = categoryAdapter
+
             tvDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+
+            ivProfile.setOnClickListener {
+                findNavController().navigate(R.id.action_homeFragment_to_profile)
+            }
         }
 
         onCategoryClicked()
@@ -49,10 +53,6 @@ class HomeFragment : Fragment() {
         setupTodayDeal()
         setupPoints()
         setupUsername()
-
-        binding.ivProfile.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_profile)
-        }
     }
 
     private fun setupUsername() {

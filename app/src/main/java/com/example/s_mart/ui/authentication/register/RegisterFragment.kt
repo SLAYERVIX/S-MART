@@ -73,11 +73,7 @@ class RegisterFragment : Fragment() {
         val email = binding.etEmail.text.toString().trim().lowercase()
         val password = binding.etPassword.text.toString().trim()
 
-        // Validates the display name, email, and password formats
-        if (validateFields(displayName, email, password)) {
-            setLoginButtonEnabled(true)
-            return
-        }
+        if (validateFields(displayName, email, password)) return
 
         createAccount(email, password, displayName)
     }
@@ -87,7 +83,38 @@ class RegisterFragment : Fragment() {
         email: String,
         password: String
     ): Boolean {
-        return !validateDisplayName(displayName) && !validateEmailFormat(email) && !validatePasswordFormat(password)
+        // Validates the display name, email, and password formats
+        if (registerViewModel.isEmptyField(displayName)) {
+            setDisplayNameHelperText(getString(R.string.field_cannot_be_empty))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        // Validates the display name, email, and password formats
+        if (registerViewModel.isEmptyField(email)) {
+            setEmailHelperText(getString(R.string.field_cannot_be_empty))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        if (registerViewModel.isEmptyField(password)) {
+            setPasswordHelperText(getString(R.string.field_cannot_be_empty))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        if (!registerViewModel.validateEmailFormat(email)) {
+            setEmailHelperText(getString(R.string.you_must_enter_a_valid_email))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        if (registerViewModel.validatePasswordLength(password)) {
+            setPasswordHelperText(getString(R.string.minimum_password_chars))
+            setLoginButtonEnabled(true)
+            return true
+        }
+        return false
     }
 
     private fun createAccount(email: String, password: String, displayName: String) {
@@ -99,6 +126,7 @@ class RegisterFragment : Fragment() {
                     RegistrationResult.Success -> {
                         updateProfileData(displayName)
                     }
+
                     RegistrationResult.UserCollision -> setEmailHelperText(getString(R.string.email_already_registered))
                 }
             }
@@ -160,23 +188,6 @@ class RegisterFragment : Fragment() {
         binding.containerDisplayName.helperText = message
     }
 
-    // Validates the email format using the authenticationViewModel
-    // Displays an error message if the format is invalid
-    private fun validateEmailFormat(email: String): Boolean {
-
-        return registerViewModel.validateEmailFormat(email) { message ->
-            setEmailHelperText(getString(message))
-        }
-    }
-
-    // Validates the password format using the authenticationViewModel
-    // Displays an error message if the format is invalid
-    private fun validatePasswordFormat(password: String): Boolean {
-
-        return registerViewModel.validatePasswordFormat(password) { message ->
-            setPasswordHelperText(getString(message))
-        }
-    }
 
     // Enables or disables the Register button based on the provided flag
     private fun setLoginButtonEnabled(isEnabled: Boolean) {

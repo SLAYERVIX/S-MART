@@ -1,4 +1,4 @@
-package com.example.s_mart.core.adapters
+package com.example.s_mart.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

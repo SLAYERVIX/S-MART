@@ -4,22 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
-import com.example.domain.entity.Client
-import com.example.domain.entity.Voucher
-import com.example.s_mart.core.utils.Date
+import androidx.fragment.app.viewModels
 import com.example.s_mart.databinding.FragmentCheckoutBinding
-import com.example.s_mart.ui.SmartViewModel
-import kotlin.math.roundToInt
 
 class CheckoutFragment : Fragment() {
 
     private var _binding: FragmentCheckoutBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SmartViewModel by activityViewModels()
+
+    private val checkoutViewModel : CheckoutViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,21 +36,21 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun setTotalPrice() {
-        viewModel.clientDocument.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener { snapshot ->
-                val client = snapshot.toObject(Client::class.java)
-                client?.let {
-                    if (it.cart.appliedVoucher.discount != 0.0) {
-                        it.cart.totalPrice -= (it.cart.totalPrice * it.cart.appliedVoucher.discount)
-                        binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
-                    }
-                    else {
-                        binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
-                    }
-                }
-            }
-            task.addOnFailureListener { }
-        }
+//        viewModel.clientDocument.get().addOnCompleteListener { task ->
+//            task.addOnSuccessListener { snapshot ->
+//                val client = snapshot.toObject(Client::class.java)
+//                client?.let {
+//                    if (it.cart.appliedVoucher.discount != 0.0) {
+//                        it.cart.totalPrice -= (it.cart.totalPrice * it.cart.appliedVoucher.discount)
+//                        binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
+//                    }
+//                    else {
+//                        binding.tvPrice.text = "EGP ${it.cart.totalPrice}"
+//                    }
+//                }
+//            }
+//            task.addOnFailureListener { }
+//        }
     }
 
     private fun validatePayment() {
@@ -65,37 +59,49 @@ class CheckoutFragment : Fragment() {
         val cvv = binding.etCvv.text.toString()
         val holderName = binding.etName.text.toString()
 
+        if (checkoutViewModel.isEmptyField(creditCard)) return
+
+        if (checkoutViewModel.isEmptyField(expire)) return
+
+        if (checkoutViewModel.isEmptyField(cvv)) return
+
+        if (checkoutViewModel.isEmptyField(holderName)) return
+
+        if (!checkoutViewModel.validateCreditCardLength(creditCard)) return
+
+        if (!checkoutViewModel.validateCreditCardFormat(creditCard)) return
+
         if (!validateCreditCard(creditCard)) return
         if (!validateExpire(expire)) return
         if (!validateCvv(cvv)) return
         if (!validateHolderName(holderName)) return
 
-        viewModel.clientDocument.get().addOnCompleteListener { task ->
-            task.addOnSuccessListener { snapshot ->
-                val client = snapshot.toObject(Client::class.java)
-                client?.let {
-                    it.points += it.cart.totalPrice.roundToInt()
-
-                    it.orderHistory.products.addAll(it.cart.products)
-                    it.orderHistory.totalPrice = it.cart.totalPrice
-                    it.orderHistory.date = Date.date
-
-                    it.cart.products.clear()
-                    it.cart.totalPrice = 0.0
-                    it.vouchers.remove(it.cart.appliedVoucher)
-
-                    it.cart.appliedVoucher = Voucher()
-
-                    viewModel.clientDocument.set(it).addOnSuccessListener {
-
-                        Toast.makeText(requireContext(), "Successful transaction", Toast.LENGTH_SHORT).show()
-                        findNavController().popBackStack()
-                        // findNavController().navigate(R.id.action_checkoutFragment_to_paymentSuccesfulFragment)
-                    }
-                }
-            }
-            task.addOnFailureListener {}
-        }
+//        viewModel.clientDocument.get().addOnCompleteListener { task ->
+//            task.addOnSuccessListener { snapshot ->
+//                val client = snapshot.toObject(Client::class.java)
+//                client?.let {
+//                    it.points += it.cart.totalPrice.roundToInt()
+//
+//                    it.orderHistory.products.addAll(it.cart.products)
+//                    it.orderHistory.totalPrice = it.cart.totalPrice
+//                    it.orderHistory.date = Date.date
+//
+//                    it.cart.products.clear()
+//                    it.cart.totalPrice = 0.0
+//                    it.vouchers.remove(it.cart.appliedVoucher)
+//
+//                    it.cart.appliedVoucher = Voucher()
+//
+//                    viewModel.clientDocument.set(it).addOnSuccessListener {
+//
+//                        Toast.makeText(requireContext(), "Successful transaction", Toast.LENGTH_SHORT).show()
+//                        findNavController().popBackStack()
+//                        // findNavController().navigate(R.id.action_checkoutFragment_to_paymentSuccesfulFragment)
+//                    }
+//                }
+//            }
+//            task.addOnFailureListener {}
+//        }
 
     }
 

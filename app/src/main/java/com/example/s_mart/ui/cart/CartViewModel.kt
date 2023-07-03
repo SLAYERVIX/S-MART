@@ -18,6 +18,11 @@ class CartViewModel
     private val bluetoothRepository: BluetoothRepository
 ) : ViewModel() {
     val barcode : SharedFlow<String> get() = bluetoothRepository.barcode
+
+    init {
+        startScan()
+    }
+
     fun removeProductFromCart(product: Product) = fireStoreRepository.deleteProductFromCart(product)
 
     fun clearCart() = fireStoreRepository.clearProductsFromCart()
@@ -36,6 +41,11 @@ class CartViewModel
 
     fun retrieveClient() : Flow<Client?> {
         return fireStoreRepository.retrieveClient()
+    }
+
+    fun calculatePriceAfterDiscount(client: Client) : Double {
+        client.cart.totalPrice -= (client.cart.totalPrice * client.cart.appliedVoucher.discount)
+        return client.cart.totalPrice
     }
 
     fun startScan() = bluetoothRepository.startScan()

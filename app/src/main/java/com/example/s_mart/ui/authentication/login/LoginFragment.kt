@@ -56,16 +56,36 @@ class LoginFragment : Fragment() {
         val email = binding.etEmail.text.toString().trim().lowercase()
         val password = binding.etPassword.text.toString().trim()
 
-        if (!validateEmailFormat(email)) {
-            setLoginButtonEnabled(true)
-            return
-        }
-        if (!validatePasswordFormat(password)) {
-            setLoginButtonEnabled(true)
-            return
-        }
+        if (validateFields(email, password)) return
 
         signInWithEmailAndPassword(email, password)
+    }
+
+    private fun validateFields(email: String, password: String): Boolean {
+        if (loginViewModel.isEmptyField(email)) {
+            setEmailHelperText(getString(R.string.field_cannot_be_empty))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        if (loginViewModel.isEmptyField(password)) {
+            setPasswordHelperText(getString(R.string.field_cannot_be_empty))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        if (!loginViewModel.validateEmailFormat(email)) {
+            setEmailHelperText(getString(R.string.you_must_enter_a_valid_email))
+            setLoginButtonEnabled(true)
+            return true
+        }
+
+        if (loginViewModel.validatePasswordLength(password)) {
+            setPasswordHelperText(getString(R.string.minimum_password_chars))
+            setLoginButtonEnabled(true)
+            return true
+        }
+        return false
     }
 
     private fun signInWithEmailAndPassword(email: String, password: String) {
@@ -85,18 +105,6 @@ class LoginFragment : Fragment() {
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun validateEmailFormat(email: String): Boolean {
-        return loginViewModel.validateEmailFormat(email) { message ->
-            setEmailHelperText(getString(message))
-        }
-    }
-
-    private fun validatePasswordFormat(password: String): Boolean {
-        return loginViewModel.validatePasswordFormat(password) { message ->
-            setPasswordHelperText(getString(message))
-        }
     }
 
     private fun setLoginButtonEnabled(isEnabled: Boolean) {

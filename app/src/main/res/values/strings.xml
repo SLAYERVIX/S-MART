@@ -38,5 +38,6 @@
     <string name="price_with_discount">Price: %1$.2f, Discount: %2$.2f%%</string>
     <string name="email_already_registered">Email already registered</string>
     <string name="connection_problems">Connection Problems</string>
+    <string name="checkout">Checkout</string>
 
 </resources>

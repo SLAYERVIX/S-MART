@@ -9,25 +9,24 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.s_mart.R
-import com.example.s_mart.core.adapters.RewardsAdapter
-import com.example.s_mart.databinding.FragmentRewardsBinding
+import com.example.s_mart.databinding.FragmentVouchersBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class RewardsFragment : Fragment() {
+class VouchersFragment : Fragment() {
 
-    private var _binding: FragmentRewardsBinding? = null
+    private var _binding: FragmentVouchersBinding? = null
     private val binding get() = _binding!!
 
     private val voucherViewModel: VoucherViewModel by viewModels()
-    private val adapter = RewardsAdapter()
+    private val adapter = VouchersAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRewardsBinding.inflate(inflater, container, false)
+        _binding = FragmentVouchersBinding.inflate(inflater, container, false)
 
         binding.rvVouchers.adapter = adapter
 

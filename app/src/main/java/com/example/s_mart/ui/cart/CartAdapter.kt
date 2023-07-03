@@ -1,4 +1,4 @@
-package com.example.s_mart.core.adapters
+package com.example.s_mart.ui.cart
 
 import android.graphics.Paint
 import android.view.LayoutInflater
