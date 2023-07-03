@@ -47,7 +47,6 @@ class CartFragment : Fragment() {
     ): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
 
-
         binding.apply {
             rvProducts.adapter = cartAdapter
             rvVouchers.adapter = voucherAdapter

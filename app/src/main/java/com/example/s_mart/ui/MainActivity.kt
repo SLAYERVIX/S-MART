@@ -5,7 +5,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.s_mart.R
 import com.example.s_mart.databinding.ActivityMainBinding
@@ -39,10 +38,6 @@ class MainActivity : AppCompatActivity() {
             R.id.rewardsFragment
         )
 
-        val appBarConfiguration = AppBarConfiguration.Builder(
-            destinations
-        ).build()
-
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -60,7 +55,9 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onSupportNavigateUp()
+    @Deprecated("Deprecated In Java")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        navController.popBackStack(R.id.homeFragment, false)
     }
 }

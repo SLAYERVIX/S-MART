@@ -26,6 +26,7 @@ class BluetoothService(
     private val context: Context
 ) {
     private lateinit var bluetoothGatt: BluetoothGatt
+
     private val scanFilters = mutableListOf<ScanFilter>()
 
     private var _barcode: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
@@ -72,6 +73,7 @@ class BluetoothService(
 
                     val descriptor =
                         it.getDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID)
+
 
                     descriptor?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                     descriptor?.let { gattDescriptor ->

@@ -5,7 +5,7 @@ import com.example.domain.repo.BluetoothRepository
 import kotlinx.coroutines.flow.SharedFlow
 
 class BluetoothRepoImpl(private val bluetoothService: BluetoothService) : BluetoothRepository {
-    override val barcode: SharedFlow<String> get() = bluetoothService.barcode
+    override fun retrieveBarcodeFlow(): SharedFlow<String> = bluetoothService.barcode
 
     override fun startScan() {
         bluetoothService.startScan()

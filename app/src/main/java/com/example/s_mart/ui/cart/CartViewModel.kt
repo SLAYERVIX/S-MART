@@ -17,7 +17,7 @@ class CartViewModel
     private val fireStoreRepository: FireStoreRepository,
     private val bluetoothRepository: BluetoothRepository
 ) : ViewModel() {
-    val barcode : SharedFlow<String> get() = bluetoothRepository.barcode
+    val barcode : SharedFlow<String> get() = bluetoothRepository.retrieveBarcodeFlow()
 
     init {
         startScan()
