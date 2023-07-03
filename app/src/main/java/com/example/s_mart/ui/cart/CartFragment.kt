@@ -1,19 +1,7 @@
 package com.example.s_mart.ui.cart
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
-import android.bluetooth.BluetoothProfile
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanFilter
-import android.bluetooth.le.ScanResult
-import android.bluetooth.le.ScanSettings
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,36 +11,25 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.data.Constants
 import com.example.domain.entity.Product
-import com.example.domain.entity.Voucher
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CartAdapter
 import com.example.s_mart.core.adapters.VoucherAdapter
-import com.example.s_mart.core.callbacks.CartCallback
-import com.example.s_mart.core.callbacks.VoucherCallback
 import com.example.s_mart.databinding.FragmentCartBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("MissingPermission")
-class CartFragment : Fragment(), CartCallback, VoucherCallback {
+class CartFragment : Fragment() {
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
     private val cartViewModel: CartViewModel by viewModels()
 
-    @Inject
-    lateinit var bluetoothAdapter: BluetoothAdapter
-
-    private lateinit var bluetoothGatt: BluetoothGatt
-    private lateinit var bluetoothGattCallback: BluetoothGattCallback
-
     private lateinit var dialog: AlertDialog
 
-    private val cartAdapter = CartAdapter(this)
-    private val voucherAdapter = VoucherAdapter(this)
+    private val cartAdapter = CartAdapter()
+    private val voucherAdapter = VoucherAdapter()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -75,6 +52,9 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
         binding.rvProducts.adapter = cartAdapter
         binding.rvVouchers.adapter = voucherAdapter
 
+        onItemDeleteClicked()
+        onVoucherApplyClicked()
+
         lifecycleScope.launch {
             cartViewModel.retrieveClient().collect { client ->
                 client?.let {
@@ -86,9 +66,15 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
             }
         }
 
-        setupBluetooth()
+        lifecycleScope.launch {
+            cartViewModel.barcode.collect {
+                if (it.isNotEmpty()) {
+                    retrieveProductByBarcode(it)
+                }
+            }
+        }
 
-        bluetoothAdapter.bluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback)
+        cartViewModel.startScan()
 
         binding.btnClear.setOnClickListener {
             dialog.show()
@@ -100,6 +86,18 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
 
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+    private fun onVoucherApplyClicked() {
+        voucherAdapter.onApplyClicked = { item ->
+            cartViewModel.updateAppliedVoucher(item)
+        }
+    }
+
+    private fun onItemDeleteClicked() {
+        cartAdapter.onItemDeleteClicked = { item ->
+            cartViewModel.removeProductFromCart(item)
+        }
     }
 
     private fun updateUi(empty: Boolean, totalPrice: Double?) {
@@ -139,71 +137,6 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
         cartViewModel.clearCart()
     }
 
-    private fun setupBluetooth() {
-        bluetoothGattCallback = object : BluetoothGattCallback() {
-            override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    // Connected to the device, start service discovery
-                    gatt.discoverServices()
-                }
-                else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    // Disconnected from the device, handle accordingly
-                    // You can attempt to reconnect or clean up the resources as needed
-                    // For example:
-                    bluetoothAdapter.bluetoothLeScanner.startScan(
-                        scanFilters,
-                        scanSettings,
-                        scanCallback
-                    )
-                    bluetoothGatt.close()
-                }
-            }
-
-            override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    val service = gatt.getService(Constants.SERVICE_UUID)
-                    val characteristic = service?.getCharacteristic(Constants.CHARACTERISTICS_UUID)
-
-                    characteristic?.let {
-                        // Enable notifications or indications on the characteristic
-                        gatt.setCharacteristicNotification(it, true)
-
-                        val descriptor =
-                            it.getDescriptor(Constants.CLIENT_CHARACTERISTIC_CONFIG_UUID)
-
-                        descriptor?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                        descriptor?.let { gattDescriptor ->
-                            if (Build.VERSION.SDK_INT == 33) {
-                                gatt.writeDescriptor(gattDescriptor, ByteArray(2))
-                            }
-                            else {
-                                @Suppress("DEPRECATION")
-                                gatt.writeDescriptor(descriptor)
-                            }
-                        }
-                    }
-                }
-            }
-
-            override fun onCharacteristicChanged(
-                gatt: BluetoothGatt,
-                characteristic: BluetoothGattCharacteristic
-            ) {
-                // Handle received data here
-                val value = characteristic.value
-
-                // Ensure the received value is not empty
-                if (value.isNotEmpty()) {
-                    // Process the received data according to your requirements
-                    // For example, convert bytes to a string if the data represents text
-                    val barcode = String(value).trim()
-
-                    retrieveProductByBarcode(barcode)
-                }
-            }
-        }
-    }
-
     private fun retrieveProductByBarcode(barcode: String) {
         lifecycleScope.launch {
             cartViewModel.retrieveProductByBarcode(barcode).collect {
@@ -218,40 +151,11 @@ class CartFragment : Fragment(), CartCallback, VoucherCallback {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if (::bluetoothGatt.isInitialized) {
-            bluetoothGatt.disconnect()
-            bluetoothGatt.close()
-        }
-
+//        if (::bluetoothGatt.isInitialized) {
+//            bluetoothGatt.disconnect()
+//            bluetoothGatt.close()
+//        }
+        cartViewModel.stopScan()
         _binding = null
-    }
-
-    override fun onDeleteClicked(item: Product) {
-        cartViewModel.removeProductFromCart(item)
-    }
-
-    private val scanFilters = mutableListOf<ScanFilter>()
-
-    private val scanSettings = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val device: BluetoothDevice = result.device
-            val deviceAddress = device.address
-
-            // Check if the device MAC address matches your desired MAC address
-            if (deviceAddress == Constants.DESIRED_DEVICE_ADDRESS) {
-                // Device found, stop scanning
-                bluetoothAdapter.bluetoothLeScanner.stopScan(this)
-
-                bluetoothGatt = device.connectGatt(requireContext(), false, bluetoothGattCallback)
-            }
-        }
-    }
-
-    override fun onApplyClicked(item: Voucher) {
-        cartViewModel.updateAppliedVoucher(item)
     }
 }

@@ -5,19 +5,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.domain.entity.Voucher
-import com.example.s_mart.core.callbacks.VoucherCallback
 import com.example.s_mart.core.differs.VoucherDiffItemCallback
 import com.example.s_mart.databinding.ItemRvVouchersHorizontalBinding
 
-class VoucherAdapter (private val voucherCallback: VoucherCallback) :
-    ListAdapter<Voucher, VoucherAdapter.ViewHolder>(VoucherDiffItemCallback()) {
+class VoucherAdapter : ListAdapter<Voucher, VoucherAdapter.ViewHolder>(VoucherDiffItemCallback()) {
+    var onApplyClicked: ((Voucher) -> Unit)? = null
     inner class ViewHolder(private val binding: ItemRvVouchersHorizontalBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Voucher) {
             binding.voucher = item
             binding.executePendingBindings()
             binding.button2.setOnClickListener {
-                voucherCallback.onApplyClicked(item)
+                onApplyClicked?.invoke(item)
             }
         }
     }

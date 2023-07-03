@@ -10,20 +10,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.example.domain.entity.Category
 import com.example.s_mart.R
 import com.example.s_mart.core.adapters.CategoryAdapter
-import com.example.s_mart.core.callbacks.CategoryCallback
 import com.example.s_mart.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), CategoryCallback {
+class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val categoryAdapter = CategoryAdapter(this)
+    private val categoryAdapter = CategoryAdapter()
 
     private val homeViewModel: HomeViewModel by viewModels()
 
@@ -37,6 +35,8 @@ class HomeFragment : Fragment(), CategoryCallback {
             rvCategories.adapter = categoryAdapter
             tvDiscount.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
+
+        onCategoryClicked()
 
         // Inflate the layout for this fragment
         return binding.root
@@ -95,9 +95,11 @@ class HomeFragment : Fragment(), CategoryCallback {
         _binding = null
     }
 
-    override fun onCategoryClicked(item: Category) {
-        findNavController().navigate(
-            HomeFragmentDirections.actionHomeFragmentToCategoryListFragment(item)
-        )
+    private fun onCategoryClicked() {
+        categoryAdapter.onCategoryClicked = {
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToCategoryListFragment(it)
+            )
+        }
     }
 }

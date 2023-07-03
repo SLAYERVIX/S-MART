@@ -15,6 +15,9 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.Build
 import com.example.data.Constants
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @SuppressLint("MissingPermission")
 class BluetoothService(
@@ -24,6 +27,9 @@ class BluetoothService(
 ) {
     private lateinit var bluetoothGatt: BluetoothGatt
     private val scanFilters = mutableListOf<ScanFilter>()
+
+    private var _barcode: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
+    val barcode: SharedFlow<String> get() = _barcode
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -39,14 +45,7 @@ class BluetoothService(
         }
     }
 
-    fun startScan() {
-        bluetoothAdapter.bluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback)
-    }
-
-    fun stopScan() {
-        bluetoothAdapter.bluetoothLeScanner.stopScan(scanCallback)
-    }
-
+    @OptIn(DelicateCoroutinesApi::class)
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -95,14 +94,19 @@ class BluetoothService(
             // Handle received data here
             val value = characteristic.value
 
-            // Ensure the received value is not empty
-            if (value.isNotEmpty()) {
-                // Process the received data according to your requirements
-                // For example, convert bytes to a string if the data represents text
-                val barcode = String(value).trim()
-
-                // retrieveProductByBarcode(barcode)
-            }
+            // Process the received data according to your requirements
+            // For example, convert bytes to a string if the data represents text
+            val barcode = String(value).trim()
+            _barcode.tryEmit(barcode)
         }
+    }
+
+
+    fun startScan() {
+        bluetoothAdapter.bluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback)
+    }
+
+    fun stopScan() {
+        bluetoothAdapter.bluetoothLeScanner.stopScan(scanCallback)
     }
 }

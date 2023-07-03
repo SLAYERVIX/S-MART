@@ -8,12 +8,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.domain.entity.Product
-import com.example.s_mart.core.callbacks.CartCallback
 import com.example.s_mart.core.differs.CartDiffItemCallback
 import com.example.s_mart.databinding.ItemRvCartBinding
 
 
-class CartAdapter(private val cartCallback: CartCallback) : ListAdapter<Product, CartAdapter.ViewHolder>(CartDiffItemCallback()) {
+class CartAdapter() :
+    ListAdapter<Product, CartAdapter.ViewHolder>(CartDiffItemCallback()) {
+    var onItemDeleteClicked: ((Product) -> Unit)? = null
+
     inner class ViewHolder(private val binding: ItemRvCartBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Product) {
@@ -27,7 +29,7 @@ class CartAdapter(private val cartCallback: CartCallback) : ListAdapter<Product,
             }
 
             binding.btnDelete.setOnClickListener {
-                cartCallback.onDeleteClicked(item)
+                onItemDeleteClicked?.invoke(item)
             }
 
             Glide.with(binding.ivProduct).load(item.imgUrl).into(binding.ivProduct)
