@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_gravity="center"
     tools:context=".ui.checkout.CheckoutFragment">
 
@@ -12,33 +12,10 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="32dp"
+        android:src="@drawable/credit_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/credit_card" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/container_credit_card"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:counterEnabled="true"
-        app:counterMaxLength="16"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView11"
-        app:placeholderText="0000 0000 0000 0000">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_credit_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/credit_card"
-            android:inputType="number"
-            android:maxLength="16" />
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView11"
@@ -52,111 +29,4 @@
         app:layout_constraintStart_toStartOf="@+id/imageView6"
         app:layout_constraintTop_toBottomOf="@+id/imageView6" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/container_expire_date"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:counterEnabled="true"
-        app:counterMaxLength="5"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/container_credit_card"
-        app:layout_constraintTop_toBottomOf="@+id/container_credit_card"
-        app:placeholderText="12/23">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_expire_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/expire_date"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent=".5" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/container_cvv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:placeholderText="123"
-        app:counterEnabled="true"
-        app:counterMaxLength="3"
-        app:layout_constraintEnd_toEndOf="@+id/container_credit_card"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/container_credit_card">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_cvv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/cvv"
-            android:inputType="number" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/btn_confirm_payment"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/confirm_payment"
-        app:layout_constraintEnd_toEndOf="@+id/container_name"
-        app:layout_constraintStart_toStartOf="@+id/container_name"
-        app:layout_constraintTop_toBottomOf="@+id/textView12" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/container_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="@+id/container_cvv"
-        app:layout_constraintStart_toStartOf="@+id/container_expire_date"
-        app:layout_constraintTop_toBottomOf="@+id/container_expire_date"
-        app:placeholderText="John Wick">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Card Holder Name"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <View
-        android:id="@+id/divider2"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="@+id/container_name"
-        app:layout_constraintStart_toStartOf="@+id/container_name"
-        app:layout_constraintTop_toBottomOf="@+id/container_name" />
-
-    <TextView
-        android:id="@+id/textView12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Total"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@+id/divider2"
-        app:layout_constraintTop_toBottomOf="@id/divider2" />
-
-    <TextView
-        android:id="@+id/tv_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="EGP 1000"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/divider2"
-        app:layout_constraintTop_toBottomOf="@+id/divider2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,20 +14,4 @@ object Validation {
     fun validatePasswordLength(password: String): Boolean {
         return password.length < 6
     }
-
-    fun validateCreditCardNumbersLength(card: String): Boolean {
-        return card.length == 16
-    }
-
-    fun validateCreditCardFormat(card: String): Boolean {
-        return Regex("^[0-9]+$").matches(card)
-    }
-
-    fun validateCvvLength(cvv : String): Boolean {
-        return cvv.length == 3
-    }
-
-    fun validateCvvFormat(cvv: String): Boolean {
-        return Regex("^[0-9]+$").matches(cvv)
-    }
 }

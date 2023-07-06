@@ -8,4 +8,6 @@ data class Category(
     val _id: Int = 0,
     val categoryName: String = "",
     val categoryImgUrl: String = "",
+    var color: String = "",
+    val thumbnail: String = "",
 ) : Parcelable

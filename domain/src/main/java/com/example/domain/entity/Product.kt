@@ -5,10 +5,11 @@ data class Product(
     val barcode : String = "",
     val imgUrl: String = "",
     val name : String = "",
-    val price: Double = 0.0,
-    val discountPercentage : Double = 0.0,
     val category : String = "",
     val bannerUrl : String = "",
     val description : String = "",
-    val isDeal : Boolean = false
+    val price: Double = 0.0,
+    val discountPercentage : Double = 0.0,
+    val isDeal : Boolean = false,
+    val hasSale : Boolean = false,
 )

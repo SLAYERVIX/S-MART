@@ -29,10 +29,6 @@ class CheckoutFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setTotalPrice()
-
-        binding.btnConfirmPayment.setOnClickListener {
-            validatePayment()
-        }
     }
 
     private fun setTotalPrice() {
@@ -54,27 +50,6 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun validatePayment() {
-        val creditCard = binding.etCreditCard.text.toString()
-        val expire = binding.etExpireDate.text.toString()
-        val cvv = binding.etCvv.text.toString()
-        val holderName = binding.etName.text.toString()
-
-        if (checkoutViewModel.isEmptyField(creditCard)) return
-
-        if (checkoutViewModel.isEmptyField(expire)) return
-
-        if (checkoutViewModel.isEmptyField(cvv)) return
-
-        if (checkoutViewModel.isEmptyField(holderName)) return
-
-        if (!checkoutViewModel.validateCreditCardLength(creditCard)) return
-
-        if (!checkoutViewModel.validateCreditCardFormat(creditCard)) return
-
-        if (!validateCreditCard(creditCard)) return
-        if (!validateExpire(expire)) return
-        if (!validateCvv(cvv)) return
-        if (!validateHolderName(holderName)) return
 
 //        viewModel.clientDocument.get().addOnCompleteListener { task ->
 //            task.addOnSuccessListener { snapshot ->
@@ -105,42 +80,6 @@ class CheckoutFragment : Fragment() {
 
     }
 
-    private fun validateHolderName(holderName: String): Boolean {
-        if (holderName.isEmpty()) {
-            return false
-        }
-        return true
-    }
-
-    private fun validateCvv(cvv: String): Boolean {
-        if (cvv.isEmpty()) {
-            return false
-        }
-        if (cvv.length < 3) {
-            return false
-        }
-        return true
-    }
-
-    private fun validateExpire(expire: String): Boolean {
-        if (expire.isEmpty()) {
-            return false
-        }
-        if (expire.length < 5) {
-            return false
-        }
-        return true
-    }
-
-    private fun validateCreditCard(creditCard: String): Boolean {
-        if (creditCard.isEmpty()) {
-            return false
-        }
-        if (creditCard.length < 16) {
-            return false
-        }
-        return true
-    }
 
     override fun onDestroy() {
         super.onDestroy()

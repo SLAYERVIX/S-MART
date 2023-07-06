@@ -5,6 +5,7 @@
 
     <data>
         <import type="android.view.View" />
+
         <variable
             name="client"
             type="com.example.domain.entity.Client" />
