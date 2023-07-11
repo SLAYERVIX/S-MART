@@ -49,4 +49,9 @@
         android:name="com.example.s_mart.ui.checkout.CheckoutFragment"
         android:label="fragment_checkout"
         tools:layout="@layout/fragment_checkout" />
+    <fragment
+        android:id="@+id/coinsMarketFragment"
+        android:name="com.example.s_mart.ui.coins_market.CoinsMarketFragment"
+        android:label="fragment_coins_market"
+        tools:layout="@layout/fragment_coins_market" />
 </navigation>

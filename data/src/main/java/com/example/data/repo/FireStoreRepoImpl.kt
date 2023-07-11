@@ -3,6 +3,7 @@ package com.example.data.repo
 import com.example.data.remote.FireStoreService
 import com.example.domain.entity.Category
 import com.example.domain.entity.Client
+import com.example.domain.entity.CoinsProduct
 import com.example.domain.entity.Product
 import com.example.domain.entity.Voucher
 import com.example.domain.repo.FireStoreRepository
@@ -13,8 +14,8 @@ class FireStoreRepoImpl (private val fireStoreService: FireStoreService) : FireS
        return fireStoreService.retrieveCategories()
     }
 
-    override fun retrieveDealOfTheDay(): Flow<Product?> {
-        return fireStoreService.retrieveDealOfTheDay()
+    override fun retrieveDeals(): Flow<List<Product>?> {
+        return fireStoreService.retrieveDeals()
     }
 
     override fun retrieveClient(): Flow<Client?> {
@@ -55,5 +56,9 @@ class FireStoreRepoImpl (private val fireStoreService: FireStoreService) : FireS
 
     override fun updateAppliedVoucher(voucher: Voucher) {
         fireStoreService.updateAppliedVoucher(voucher)
+    }
+
+    override fun retrieveCoinsProducts(): Flow<List<CoinsProduct>> {
+        return fireStoreService.retrieveCoinsProducts()
     }
 }

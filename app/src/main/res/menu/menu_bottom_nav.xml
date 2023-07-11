@@ -18,4 +18,8 @@
         android:icon="@drawable/baseline_local_offer_24"
         android:title="Rewards"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/coinsMarketFragment"
+        android:icon="@drawable/baseline_shopping_bag_24"
+        android:title="Coins Market" />
 </menu>

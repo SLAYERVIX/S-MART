@@ -29,6 +29,10 @@ object FireStoreModule {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
+    annotation class CoinsProductsCollectionReference
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
     annotation class VoucherCollectionReference
 
     @Provides
@@ -41,6 +45,13 @@ object FireStoreModule {
     @Singleton
     fun provideCategoryCollectionRef(fireStore: FirebaseFirestore): CollectionReference {
         return fireStore.collection(Constants.CATEGORIES_REF)
+    }
+
+    @Provides
+    @CoinsProductsCollectionReference
+    @Singleton
+    fun provideCoinsProductsCollectionRef(fireStore: FirebaseFirestore): CollectionReference {
+        return fireStore.collection(Constants.COINS_PRODUCTS)
     }
 
     @Provides
@@ -71,6 +82,7 @@ object FireStoreModule {
         @ProductCollectionReference productCollectionReference: CollectionReference,
         @ClientCollectionReference clientCollectionReference: CollectionReference,
         @VoucherCollectionReference voucherCollectionReference: CollectionReference,
+        @CoinsProductsCollectionReference coinsProductsCollectionReference: CollectionReference,
         firebaseAuth: FirebaseAuth
     ): FireStoreService {
         return FireStoreService(
@@ -78,6 +90,7 @@ object FireStoreModule {
             productCollectionReference,
             clientCollectionReference,
             voucherCollectionReference,
+            coinsProductsCollectionReference,
             firebaseAuth
         )
     }

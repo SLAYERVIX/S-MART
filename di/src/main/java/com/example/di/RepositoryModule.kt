@@ -1,14 +1,17 @@
 package com.example.di
 
 import com.example.data.bluetooth.BluetoothService
+import com.example.data.network.PaymentService
 import com.example.data.remote.FireStoreService
 import com.example.data.remote.FirebaseAuthService
 import com.example.data.repo.BluetoothRepoImpl
 import com.example.data.repo.FireStoreRepoImpl
 import com.example.data.repo.FirebaseAuthRepoImpl
+import com.example.data.repo.StripeRepoImpl
 import com.example.domain.repo.BluetoothRepository
 import com.example.domain.repo.FireStoreRepository
 import com.example.domain.repo.FirebaseAuthRepository
+import com.example.domain.repo.StripeRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,5 +33,10 @@ object RepositoryModule {
     @Provides
     fun provideBluetoothRepository(bluetoothService: BluetoothService) : BluetoothRepository {
         return BluetoothRepoImpl(bluetoothService)
+    }
+
+    @Provides
+    fun provideStripeRepository(paymentService: PaymentService) : StripeRepository {
+        return StripeRepoImpl(paymentService)
     }
 }

@@ -35,7 +35,8 @@ class MainActivity : AppCompatActivity() {
         val destinations = setOf(
             R.id.homeFragment,
             R.id.cartFragment,
-            R.id.rewardsFragment
+            R.id.rewardsFragment,
+            R.id.coinsMarketFragment
         )
 
         binding.bottomNavigationView.setupWithNavController(navController)

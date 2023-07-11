@@ -2,7 +2,6 @@ package com.example.s_mart.ui.home
 
 import androidx.lifecycle.ViewModel
 import com.example.domain.entity.Category
-import com.example.domain.entity.Client
 import com.example.domain.entity.Product
 import com.example.domain.repo.FireStoreRepository
 import com.example.domain.repo.FirebaseAuthRepository
@@ -19,9 +18,7 @@ constructor(
 ) : ViewModel() {
     fun retrieveCategories(): Flow<List<Category>> = fireStoreRepository.retrieveCategories()
 
-    fun retrieveDealOfTheDay(): Flow<Product?> = fireStoreRepository.retrieveDealOfTheDay()
+    fun retrieveDeals(): Flow<List<Product>?> = fireStoreRepository.retrieveDeals()
 
     fun retrieveFirebaseUser(): FirebaseUser? = firebaseAuthRepository.retrieveCurrentUser()
-
-    val retrieveClient: Flow<Client?> = fireStoreRepository.retrieveClient()
 }

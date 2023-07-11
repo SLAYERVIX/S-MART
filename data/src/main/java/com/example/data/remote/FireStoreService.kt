@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.data.Constants
 import com.example.domain.entity.Category
 import com.example.domain.entity.Client
+import com.example.domain.entity.CoinsProduct
 import com.example.domain.entity.Product
 import com.example.domain.entity.Voucher
 import com.example.s_mart.core.utils.calcDiscount
@@ -19,6 +20,7 @@ class FireStoreService(
     private val productReference: CollectionReference,
     private val clientReference: CollectionReference,
     private val voucherReference: CollectionReference,
+    private val coinsProductReference: CollectionReference,
     private val firebaseAuth: FirebaseAuth,
 ) {
     fun retrieveCategories(): Flow<List<Category>> = callbackFlow {
@@ -35,12 +37,12 @@ class FireStoreService(
         awaitClose()
     }
 
-    fun retrieveDealOfTheDay(): Flow<Product?> = callbackFlow {
-        productReference.whereEqualTo(Constants.DEAL_TYPE_FIELD, true).limit(1).get()
+    fun retrieveDeals(): Flow<List<Product>?> = callbackFlow {
+        productReference.whereEqualTo(Constants.DEAL_TYPE_FIELD, true).get()
             .addOnCompleteListener { task ->
                 task.addOnSuccessListener { snapshot ->
-                    val product = snapshot.documents.first().toObject(Product::class.java)
-                    trySend(product)
+                    val products = snapshot.toObjects(Product::class.java)
+                    trySend(products)
                 }
                 task.addOnFailureListener {
                     Log.e(FireStoreService::class.simpleName, "retrieveDealOfTheDay: ${it.message}")
@@ -222,5 +224,17 @@ class FireStoreService(
                 }
             }
         }
+    }
+
+    fun retrieveCoinsProducts() : Flow<List<CoinsProduct>> = callbackFlow {
+        coinsProductReference.get().addOnCompleteListener { task ->
+            task.addOnSuccessListener { snapshot ->
+                trySend(snapshot.toObjects(CoinsProduct::class.java))
+            }
+            task.addOnFailureListener {
+                Log.e(FireStoreService::class.simpleName, "retrieveVouchers: ${it.message}")
+            }
+        }
+        awaitClose()
     }
 }
